@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, createContext, useContext, useReducer, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, createContext, useContext, useReducer, useCallback, Component } from "react";
 import * as XLSX from "xlsx";
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -320,10 +320,10 @@ let _userId = 1;
 const genUserId = () => `USR-${String(_userId++).padStart(3,"0")}`;
 
 const INITIAL_USERS = [
-  { id:"USR-001", name:"Priya Sharma",  email:"priya@smca.in",  role:"Admin",    status:"Active",   inviteStatus:"Active",         assignedClients:null,                                     lastLogin:"Today, 9:14 AM" },
-  { id:"USR-002", name:"Rahul Verma",   email:"rahul@smca.in",  role:"End User", status:"Active",   inviteStatus:"Active",         assignedClients:["CLT-001","CLT-002","CLT-004","CLT-007"], lastLogin:"Today, 8:52 AM" },
-  { id:"USR-003", name:"Sunita Patel",  email:"sunita@smca.in", role:"End User", status:"Active",   inviteStatus:"Active",         assignedClients:["CLT-003","CLT-005","CLT-006"],           lastLogin:"Yesterday"      },
-  { id:"USR-004", name:"Arjun Mehra",   email:"arjun@smca.in",  role:"End User", status:"Inactive", inviteStatus:"Inactive",       assignedClients:["CLT-008"],                               lastLogin:"3 days ago"     },
+  { id:"USR-001", name:"Admin User",  email:"admin@example.com",  role:"Admin",    status:"Active",   inviteStatus:"Active",         assignedClients:null,                                     lastLogin:"Today, 9:14 AM" },
+  { id:"USR-002", name:"User A",      email:"usera@example.com",  role:"End User", status:"Active",   inviteStatus:"Active",         assignedClients:["CLT-001","CLT-002","CLT-004","CLT-007"], lastLogin:"Today, 8:52 AM" },
+  { id:"USR-003", name:"User B",      email:"userb@example.com",  role:"End User", status:"Active",   inviteStatus:"Active",         assignedClients:["CLT-003","CLT-005","CLT-006"],           lastLogin:"Yesterday"      },
+  { id:"USR-004", name:"User C",      email:"userc@example.com",  role:"End User", status:"Inactive", inviteStatus:"Inactive",       assignedClients:["CLT-008"],                               lastLogin:"3 days ago"     },
 ];
 
 const canEditClient = (activeUser, clientId) => {
@@ -351,14 +351,14 @@ const PALETTE = ["#00c9b1","#4a90d9","#34d399","#fbbf24","#f87171","#7ec8e3","#f
 
 // ── Initial clients ───────────────────────────────────────────────────────────
 const initialClients = [
-  { id:"CLT-001", clientName:"Agarwal Industries Ltd.",  personName:"Ramesh Agarwal",  type:"Corporate",   sector:"Manufacturing", pan:"AAGCA1234B", gst:"27AAGCA1234B1ZK", turnover:"₹42.8 Cr", status:"Active",   rm:"Priya Sharma",  dueDate:"31 Jul 2025", tasks:4, risk:"Low"    },
-  { id:"CLT-002", clientName:"Mehta & Sons Pvt. Ltd.",   personName:"Suresh Mehta",    type:"Corporate",   sector:"Retail",        pan:"AADCM5678C", gst:"06AADCM5678C1ZP", turnover:"₹18.3 Cr", status:"Active",   rm:"Rahul Verma",   dueDate:"15 Aug 2025", tasks:7, risk:"Medium" },
-  { id:"CLT-003", clientName:"Rajesh Kumar (HUF)",        personName:"Rajesh Kumar",    type:"HUF",         sector:"Real Estate",   pan:"AAJHR4532D", gst:"—",               turnover:"₹9.6 Cr",  status:"Active",   rm:"Sunita Patel",  dueDate:"31 Jul 2025", tasks:2, risk:"Low"    },
-  { id:"CLT-004", clientName:"TechNova Solutions LLP",   personName:"Amit Shah",       type:"LLP",         sector:"IT Services",   pan:"AADFT2290E", gst:"29AADFT2290E1ZM", turnover:"₹31.5 Cr", status:"Active",   rm:"Priya Sharma",  dueDate:"30 Jun 2025", tasks:9, risk:"High"   },
-  { id:"CLT-005", clientName:"Sunrise Exports Ltd.",     personName:"Kavita Nair",     type:"Corporate",   sector:"Export",        pan:"AABCS7823F", gst:"33AABCS7823F1ZB", turnover:"₹56.2 Cr", status:"Inactive", rm:"Rahul Verma",   dueDate:"31 Aug 2025", tasks:1, risk:"Low"    },
-  { id:"CLT-006", clientName:"Dr. Anita Desai",          personName:"Anita Desai",     type:"Individual",  sector:"Healthcare",    pan:"AHDAD9012G", gst:"—",               turnover:"₹2.8 Cr",  status:"Active",   rm:"Sunita Patel",  dueDate:"31 Jul 2025", tasks:3, risk:"Low"    },
-  { id:"CLT-007", clientName:"Bharat Steel Works",       personName:"Dinesh Gupta",    type:"Partnership", sector:"Steel",         pan:"AABFB4561H", gst:"24AABFB4561H1ZL", turnover:"₹74.1 Cr", status:"Active",   rm:"Priya Sharma",  dueDate:"15 Sep 2025", tasks:6, risk:"Medium" },
-  { id:"CLT-008", clientName:"Green Energy Ventures",    personName:"Priti Joshi",     type:"Corporate",   sector:"Energy",        pan:"AAGCG8834I", gst:"07AAGCG8834I1ZQ", turnover:"₹22.9 Cr", status:"Active",   rm:"Rahul Verma",   dueDate:"31 Jul 2025", tasks:5, risk:"Medium" },
+  { id:"CLT-001", clientName:"Client Alpha",   personName:"Contact A",  type:"Corporate",   sector:"Manufacturing", pan:"PANXXXXX1", gst:"GSTXXXXX1", turnover:"₹42.8 Cr", status:"Active",   rm:"Admin User",  dueDate:"31 Jul 2025", tasks:4, risk:"Low"    },
+  { id:"CLT-002", clientName:"Client Beta",    personName:"Contact B",  type:"Corporate",   sector:"Retail",        pan:"PANXXXXX2", gst:"GSTXXXXX2", turnover:"₹18.3 Cr", status:"Active",   rm:"User A",      dueDate:"15 Aug 2025", tasks:7, risk:"Medium" },
+  { id:"CLT-003", clientName:"Client Gamma",   personName:"Contact C",  type:"HUF",         sector:"Real Estate",   pan:"PANXXXXX3", gst:"—",          turnover:"₹9.6 Cr",  status:"Active",   rm:"User B",      dueDate:"31 Jul 2025", tasks:2, risk:"Low"    },
+  { id:"CLT-004", clientName:"Client Delta",   personName:"Contact D",  type:"LLP",         sector:"IT Services",   pan:"PANXXXXX4", gst:"GSTXXXXX4", turnover:"₹31.5 Cr", status:"Active",   rm:"Admin User",  dueDate:"30 Jun 2025", tasks:9, risk:"High"   },
+  { id:"CLT-005", clientName:"Client Epsilon", personName:"Contact E",  type:"Corporate",   sector:"Export",        pan:"PANXXXXX5", gst:"GSTXXXXX5", turnover:"₹56.2 Cr", status:"Inactive", rm:"User A",      dueDate:"31 Aug 2025", tasks:1, risk:"Low"    },
+  { id:"CLT-006", clientName:"Client Zeta",    personName:"Contact F",  type:"Individual",  sector:"Healthcare",    pan:"PANXXXXX6", gst:"—",          turnover:"₹2.8 Cr",  status:"Active",   rm:"User B",      dueDate:"31 Jul 2025", tasks:3, risk:"Low"    },
+  { id:"CLT-007", clientName:"Client Eta",     personName:"Contact G",  type:"Partnership", sector:"Steel",         pan:"PANXXXXX7", gst:"GSTXXXXX7", turnover:"₹74.1 Cr", status:"Active",   rm:"Admin User",  dueDate:"15 Sep 2025", tasks:6, risk:"Medium" },
+  { id:"CLT-008", clientName:"Client Theta",   personName:"Contact H",  type:"Corporate",   sector:"Energy",        pan:"PANXXXXX8", gst:"GSTXXXXX8", turnover:"₹22.9 Cr", status:"Active",   rm:"User A",      dueDate:"31 Jul 2025", tasks:5, risk:"Medium" },
 ];
 
 // ── Currency config ───────────────────────────────────────────────────────────
@@ -399,6 +399,75 @@ const DEFAULT_RATES = { INR:1, USD:83.5, EUR:90.2, GBP:105.8, AED:22.7, SGD:62.1
 
 let _rowId = 1;
 const genRowId = () => `FR-${String(_rowId++).padStart(4,"0")}`;
+
+// ── XLSX formula-injection sanitizer ─────────────────────────────────────────
+// Prevents cells whose value starts with = + - @ from being interpreted as
+// spreadsheet formulas when the exported file is opened in Excel / Google Sheets.
+// Applied only to user-entered free-text string fields in every export function.
+// Numeric and date fields are left untouched.
+const xlsSafe = (val) => {
+  if (val === null || val === undefined) return "";
+  const s = String(val);
+  return /^[=+\-@]/.test(s) ? `'${s}` : s;
+};
+
+// ── Error Boundary ────────────────────────────────────────────────────────────
+// Catches any unhandled render error in the main content area so the sidebar
+// and provider tree survive. Users see a recovery UI instead of a blank screen.
+// Class component required — React hooks cannot implement componentDidCatch.
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    // Surface the error in the browser console for diagnostics
+    console.error("[ProCAS ErrorBoundary] Unhandled render error:", error, info.componentStack);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          minHeight: "60vh", display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          padding: "40px 24px", textAlign: "center",
+          fontFamily: "'Outfit','DM Sans','Segoe UI',system-ui,sans-serif",
+        }}>
+          <div style={{ fontSize: 44, marginBottom: 16 }}>⚠️</div>
+          <h2 style={{ color: "#f87171", fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+            Something went wrong
+          </h2>
+          <p style={{ color: "#5a7a99", fontSize: 13, marginBottom: 24, maxWidth: 420, lineHeight: 1.6 }}>
+            An unexpected error occurred in this module. Your other data is safe.
+            Click <strong>Try Again</strong> to recover, or refresh the page.
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false, error: null })}
+            style={{
+              background: "linear-gradient(135deg,#00a896,#1b5fa8)",
+              color: "#fff", border: "none", borderRadius: 10,
+              padding: "10px 28px", fontSize: 13, fontWeight: 600,
+              cursor: "pointer", marginBottom: 16,
+            }}>
+            Try Again
+          </button>
+          {this.state.error && (
+            <pre style={{
+              color: "#4a6a8a", fontSize: 10, maxWidth: 560,
+              overflowX: "auto", textAlign: "left", whiteSpace: "pre-wrap",
+            }}>
+              {this.state.error.toString()}
+            </pre>
+          )}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 const fmtINRShort = n => {
@@ -774,7 +843,7 @@ const PersonDropdown = ({ t, dark, value, onChange, error }) => {
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
-        placeholder="e.g. Rahul Verma, Sunita Patel"
+        placeholder="e.g. User A, User B"
         className={`w-full px-3 py-2.5 rounded-xl border text-sm outline-none
           focus:ring-2 focus:ring-[#00c9b1] ${t.input} ${error ? "border-[#f87171]" : ""}`}
       />
@@ -930,7 +999,7 @@ const ClientFormModal = ({ t, dark, initial, onSave, onClose }) => {
             <input
               value={form.clientName || ""}
               onChange={e => set("clientName", e.target.value)}
-              placeholder="e.g. Agarwal Industries Ltd."
+              placeholder="e.g. Client Name"
               className={`w-full px-3 py-2.5 rounded-xl border text-sm outline-none
                 focus:ring-2 focus:ring-[#00c9b1] ${t.input} ${errors.clientName ? "border-[#f87171]" : ""}`}/>
             {errors.clientName && <p className="text-[#f87171] text-xs mt-1">{errors.clientName}</p>}
@@ -1116,10 +1185,10 @@ const MasterClientTab = ({ t, dark, isAdmin }) => {
   // ── Download 4-column template ────────────────────────────────────────────────
   const downloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Client Name",       "Name of User",                "Sector",        "State"],
-      ["ABC Pvt Ltd",       "Rahul Verma",                 "IT Services",   "Karnataka"],
-      ["XYZ Ltd",           "Rahul Verma, Sunita Patel",   "Manufacturing", "Maharashtra"],
-      ["Sample Corp",       "Priya Sharma",                "Healthcare",    "Delhi"],
+      ["Client Name",       "Name of User",          "Sector",        "State"],
+      ["Client Alpha",      "User A",                "IT Services",   "Karnataka"],
+      ["Client Beta",       "User A, User B",        "Manufacturing", "Maharashtra"],
+      ["Client Gamma",      "Admin User",            "Healthcare",    "Delhi"],
     ]);
     ws["!cols"] = [{wch:35},{wch:35},{wch:20},{wch:20}];
     const wb = XLSX.utils.book_new();
@@ -1236,17 +1305,17 @@ const MasterClientTab = ({ t, dark, isAdmin }) => {
       const data = filtered.map((c, i) => ({
         "#":              i + 1,
         "Client ID":      c.id,
-        "Client Name":    c.clientName,
-        "Name of User":   c.personName  || "—",
-        "Sector":         c.sector      || "—",
-        "State":          c.state       || "—",
-        "Type":           c.type        || "Corporate",
-        "Status":         c.status      || "Active",
-        "Risk":           c.risk        || "Low",
-        "PAN":            c.pan         || "—",
-        "GST":            c.gst         || "—",
-        "Turnover":       c.turnover    || "—",
-        "Due Date":       c.dueDate     || "—",
+        "Client Name":    xlsSafe(c.clientName),
+        "Name of User":   xlsSafe(c.personName  || "—"),
+        "Sector":         xlsSafe(c.sector       || "—"),
+        "State":          xlsSafe(c.state        || "—"),
+        "Type":           xlsSafe(c.type         || "Corporate"),
+        "Status":         xlsSafe(c.status       || "Active"),
+        "Risk":           xlsSafe(c.risk         || "Low"),
+        "PAN":            xlsSafe(c.pan          || "—"),
+        "GST":            xlsSafe(c.gst          || "—"),
+        "Turnover":       xlsSafe(c.turnover     || "—"),
+        "Due Date":       xlsSafe(c.dueDate      || "—"),
       }));
       if (!data.length) { alert("No client records to export."); return; }
       const ws = XLSX.utils.json_to_sheet(data);
@@ -1406,7 +1475,7 @@ const MasterClientTab = ({ t, dark, isAdmin }) => {
             ))}
           </div>
           <p className={`text-[10px] mt-2 ${t.textMuted}`}>
-            * Required · Multiple users: <code className="px-1 rounded" style={{background:dark?"#1a2d44":"#e8f0f8"}}>Rahul Sharma, Priya Mehta</code> · Users validated against User Database (active only)
+            * Required · Multiple users: <code className="px-1 rounded" style={{background:dark?"#1a2d44":"#e8f0f8"}}>User A, User B</code> · Users validated against User Database (active only)
           </p>
         </div>
       </div>
@@ -2464,8 +2533,8 @@ const CasMisTable = ({ t, dark, isAdmin, fy, month }) => {
         };
         return {
           "#":                             idx + 1,
-          "Client Name":                   row.clientName,
-          "Name of User":                  row._userName || row.personName || "—",
+          "Client Name":                   xlsSafe(row.clientName),
+          "Name of User":                  xlsSafe(row._userName || row.personName || "—"),
           "Financial Year":                fy,
           "Month":                         month,
           "PT Payment Date":               d.ptPayDateNA         ? "NA" : fmtDate(d.ptPayDate         || ""),
@@ -2478,17 +2547,17 @@ const CasMisTable = ({ t, dark, isAdmin, fy, month }) => {
           "GSTR 3B Filing Date":           d.gstr3bDateNA        ? "NA" : fmtDate(d.gstr3bDate        || ""),
           "Date of Payment Made":          d.paymentMadeDateNA   ? "NA" : fmtDate(d.paymentMadeDate   || ""),
           "Date of Collection (Zoho)":     d.collectionDateNA    ? "NA" : fmtDate(d.collectionDate    || ""),
-          "PT Challan to OneNote":         d.ptChallan           || "",
-          "TDS Challan to OneNote":        d.tdsChallan          || "",
-          "PF Challan to OneNote":         d.pfChallan           || "",
-          "Comm to GST Team":              d.commGST             || "",
-          "Microsoft OneNote":             d.msOneNote           || "",
-          "Accounting Software":           d.acctSw              || "",
+          "PT Challan to OneNote":         xlsSafe(d.ptChallan           || ""),
+          "TDS Challan to OneNote":        xlsSafe(d.tdsChallan          || ""),
+          "PF Challan to OneNote":         xlsSafe(d.pfChallan           || ""),
+          "Comm to GST Team":              xlsSafe(d.commGST             || ""),
+          "Microsoft OneNote":             xlsSafe(d.msOneNote           || ""),
+          "Accounting Software":           xlsSafe(d.acctSw              || ""),
           "Monthly SPOC Fee (Mar 2025)":   d.spocFeeAmt          || "",
           "CAS Fee":                       d.casFeeAmt           || "",
           "SPOC Fee Pending from Client":  d.spocPendingAmt      || "",
-          "Staff Remarks":                 remarksStore[`${row._key}__staffRemarks`]   || d.staffRemarks   || "",
-          "SPOC Billing Remarks":          remarksStore[`${row._key}__billingRemarks`] || d.billingRemarks || "",
+          "Staff Remarks":                 xlsSafe(remarksStore[`${row._key}__staffRemarks`]   || d.staffRemarks   || ""),
+          "SPOC Billing Remarks":          xlsSafe(remarksStore[`${row._key}__billingRemarks`] || d.billingRemarks || ""),
         };
       });
       if (!exportRows.length) { alert("No data to export."); return; }
@@ -3302,9 +3371,9 @@ const YNABadge = ({ value }) => {
 
 // ── User assignment map (demo) ────────────────────────────────────────────────
 const KRA_USERS = [
-  { id:"USR-001", name:"Priya Sharma",  role:"Admin"   },
-  { id:"USR-002", name:"Rahul Verma",   role:"End User" },
-  { id:"USR-003", name:"Sunita Patel",  role:"End User"  },
+  { id:"USR-001", name:"Admin User", role:"Admin"   },
+  { id:"USR-002", name:"User A",     role:"End User" },
+  { id:"USR-003", name:"User B",     role:"End User"  },
 ];
 // Map: userId → list of clientIds they manage (demo — admin sees all)
 const USER_CLIENT_ASSIGNMENT = {
@@ -3389,6 +3458,9 @@ const KraKpiTab = ({ t, dark, isAdmin }) => {
   const { clients, syncing, lastSynced, triggerSync } = useSyncContext();
   const { locks } = useLockCtx();
   const { assignedClientIds, activeUser } = useRBAC();
+  // Pulled to component top level to satisfy Rules of Hooks —
+  // used in visibleClients useMemo (user filter) and the User dropdown.
+  const { users: allUsers } = useContext(UserContext);
 
   const [fy, setFy]             = useState(DEFAULT_FY);
   const [month, setMonth]       = useState("April");
@@ -3417,8 +3489,7 @@ const KraKpiTab = ({ t, dark, isAdmin }) => {
     let base = clients;
     // Admin user filter: filter by selected user's assignedClients
     if (isAdmin && userFilter !== "All") {
-      const ctx = (() => { try { return useContext(UserContext); } catch { return null; }})();
-      const filteredUser = ctx?.users?.find(u => u.id === userFilter);
+      const filteredUser = (allUsers || []).find(u => u.id === userFilter);
       if (filteredUser?.assignedClients) {
         base = base.filter(c => filteredUser.assignedClients.includes(c.id));
       }
@@ -3427,7 +3498,7 @@ const KraKpiTab = ({ t, dark, isAdmin }) => {
     if (clientFilter !== "All")
       base = base.filter(c => c.id === clientFilter || c.clientName === clientFilter);
     return base;
-  }, [clients, isAdmin, userFilter, clientFilter]);
+  }, [clients, isAdmin, userFilter, clientFilter, allUsers]);
 
   // ── Aggregate KPIs ────────────────────────────────────────────────────────
   const aggStats = useMemo(() => {
@@ -3457,18 +3528,18 @@ const KraKpiTab = ({ t, dark, isAdmin }) => {
         const r = getRow(c.id);
         return {
           "#":                  i + 1,
-          "Client Name":        c.clientName,
-          "Name of User":       c.personName  || "—",
+          "Client Name":        xlsSafe(c.clientName),
+          "Name of User":       xlsSafe(c.personName  || "—"),
           "Financial Year":     fy,
           "Month":              month,
           "MIS Date":           r.misDate     || "",
           "MIS Status":         r.misDate ? (misDateStatus(r.misDate).late ? "Late" : "On Time") : "Not Set",
-          "MYSA Usage":         r.mysaUsage   || "",
-          "Revert / Rect 15d":  r.revertRect  || "",
+          "MYSA Usage":         xlsSafe(r.mysaUsage   || ""),
+          "Revert / Rect 15d":  xlsSafe(r.revertRect  || ""),
           "Escalations":        r.escalations !== undefined ? r.escalations : "",
-          "Raksha Tool":        r.rakshaTool  || "",
-          "CapitallWant":       r.capitalWant || "",
-          "Remarks":            r.remarks     || "",
+          "Raksha Tool":        xlsSafe(r.rakshaTool  || ""),
+          "CapitallWant":       xlsSafe(r.capitalWant || ""),
+          "Remarks":            xlsSafe(r.remarks     || ""),
           "KPI Score (%)":      rowHealthScore(r),
         };
       });
@@ -3523,8 +3594,10 @@ const KraKpiTab = ({ t, dark, isAdmin }) => {
               <span className={`text-xs font-semibold ${t.textMuted}`}>User</span>
               <select value={userFilter} onChange={e => setUserFilter(e.target.value)} className={sel}>
                 <option value="All">All Users</option>
-                {/* Live user list from UserContext */}
-                {(() => { try { const ctx = useContext(UserContext); return (ctx?.users||[]).filter(u=>u.status==="Active").map(u=><option key={u.id} value={u.id}>{u.name}</option>); } catch { return null; } })()}
+                {/* Live user list from UserContext — allUsers sourced at component top level */}
+                {(allUsers || []).filter(u => u.status === "Active").map(u =>
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                )}
               </select>
             </div>
           )}
@@ -4136,12 +4209,12 @@ const KraKpiTab = ({ t, dark, isAdmin }) => {
               if (items.length === 0) {
                 // Demo data
                 const demo = [
-                  {name:"Agarwal Ind.", day:5, late:false},
-                  {name:"TechNova LLP", day:8, late:false},
-                  {name:"Mehta & Sons", day:10, late:false},
-                  {name:"Bharat Steel", day:13, late:true},
-                  {name:"Green Energy", day:16, late:true},
-                  {name:"Sunrise Exp.", day:9, late:false},
+                  {name:"Client Alpha",   day:5, late:false},
+                  {name:"Client Delta",   day:8, late:false},
+                  {name:"Client Beta",    day:10, late:false},
+                  {name:"Client Eta",     day:13, late:true},
+                  {name:"Client Theta",   day:16, late:true},
+                  {name:"Client Epsilon", day:9, late:false},
                 ];
                 return (
                   <div className="space-y-2">
@@ -4610,18 +4683,18 @@ const FundRequestTab = ({ t, dark, isAdmin }) => {
   const [quarterFilter, setQuarterFilter] = useState("All");
 
   const [rows, setRows] = useState([
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Agarwal Industries Ltd.",  currency:"USD", amountFC:"50000",  rate:"83.5",  remarks:"Import payment Q1",          month:"April"    },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"TechNova Solutions LLP",  currency:"EUR", amountFC:"20000",  rate:"90.2",  remarks:"Software license renewal",     month:"April"    },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Mehta & Sons Pvt. Ltd.",  currency:"INR", amountFC:"500000", rate:"1",     remarks:"Advance tax installment",      month:"May"      },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Bharat Steel Works",      currency:"GBP", amountFC:"15000",  rate:"105.8", remarks:"Machinery parts import",       month:"May"      },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Green Energy Ventures",   currency:"AED", amountFC:"80000",  rate:"22.7",  remarks:"Joint venture remittance",     month:"June"     },
-    { _id:genRowId(), applicability_status:"not_applicable", clientName:"Sunrise Exports Ltd.",  currency:"SGD", amountFC:"12000",  rate:"62.1",  remarks:"Pending clarification",        month:"June"     },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Agarwal Industries Ltd.", currency:"USD", amountFC:"35000",  rate:"83.9",  remarks:"Q2 import settlement",         month:"July"     },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"TechNova Solutions LLP",  currency:"CHF", amountFC:"8000",   rate:"95.4",  remarks:"Swiss partner payment",        month:"August"   },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Dr. Anita Desai",         currency:"AUD", amountFC:"5000",   rate:"54.3",  remarks:"Medical conference fee",       month:"September"},
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Bharat Steel Works",      currency:"JPY", amountFC:"500000", rate:"0.56",  remarks:"Japanese machinery payment",   month:"October"  },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Rajesh Kumar (HUF)",      currency:"INR", amountFC:"250000", rate:"1",     remarks:"Property rental income",       month:"November" },
-    { _id:genRowId(), applicability_status:"applicable", clientName:"Green Energy Ventures",   currency:"HKD", amountFC:"60000",  rate:"10.7",  remarks:"HK investment proceeds",      month:"December" },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Alpha",   currency:"USD", amountFC:"50000",  rate:"83.5",  remarks:"Import payment Q1",        month:"April"    },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Delta",   currency:"EUR", amountFC:"20000",  rate:"90.2",  remarks:"Software license renewal",  month:"April"    },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Beta",    currency:"INR", amountFC:"500000", rate:"1",     remarks:"Advance tax installment",   month:"May"      },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Eta",     currency:"GBP", amountFC:"15000",  rate:"105.8", remarks:"Machinery parts import",    month:"May"      },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Theta",   currency:"AED", amountFC:"80000",  rate:"22.7",  remarks:"Joint venture remittance",  month:"June"     },
+    { _id:genRowId(), applicability_status:"not_applicable", clientName:"Client Epsilon", currency:"SGD", amountFC:"12000",  rate:"62.1",  remarks:"Pending clarification",     month:"June"     },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Alpha",   currency:"USD", amountFC:"35000",  rate:"83.9",  remarks:"Q2 import settlement",      month:"July"     },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Delta",   currency:"CHF", amountFC:"8000",   rate:"95.4",  remarks:"Partner payment",          month:"August"   },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Zeta",    currency:"AUD", amountFC:"5000",   rate:"54.3",  remarks:"Professional fee",         month:"September"},
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Eta",     currency:"JPY", amountFC:"500000", rate:"0.56",  remarks:"Machinery payment",        month:"October"  },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Gamma",   currency:"INR", amountFC:"250000", rate:"1",     remarks:"Rental income",            month:"November" },
+    { _id:genRowId(), applicability_status:"applicable",     clientName:"Client Theta",   currency:"HKD", amountFC:"60000",  rate:"10.7",  remarks:"Investment proceeds",      month:"December" },
   ]);
 
   const [openDropId, setOpenDropId]   = useState(null);
@@ -4678,12 +4751,12 @@ const FundRequestTab = ({ t, dark, isAdmin }) => {
         return {
           "#":                   i+1,
           "Applicable?":         isNA ? "Not Applicable" : "Applicable",
-          "Client Name":         isNA ? "NA" : (r.clientName   || ""),
+          "Client Name":         isNA ? "NA" : xlsSafe(r.clientName   || ""),
           "Currency":            isNA ? "NA" : (r.currency     || ""),
           "Amount (Foreign)":    isNA ? "NA" : (parseFloat(r.amountFC) || 0),
           "Exchange Rate":       isNA ? "NA" : (parseFloat(r.rate)     || 0),
           "Amount in INR":       isNA ? "NA" : calcINR(r),
-          "Remarks":             r.remarks || "",
+          "Remarks":             xlsSafe(r.remarks || ""),
           "Month":               r.month   || "",
           "Financial Year":      fy,
         };
@@ -4986,8 +5059,8 @@ const FundRequestTab = ({ t, dark, isAdmin }) => {
     try {
       const data = filteredLedger.map((r,i) => ({
         "#":              i+1,
-        "Client Name":    r.client,
-        "Parent Entity":  r.parent,
+        "Client Name":    xlsSafe(r.client),
+        "Parent Entity":  xlsSafe(r.parent),
         "Date Received":  r.date,
         "Expected (INR)": r.expected,
         "Actual Received (INR)": r.actual,
@@ -5975,7 +6048,7 @@ const InviteFormModal = ({ t, dark, title, form, setForm, formErr, onSave, onClo
             type="text"
             value={form.name}
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-            placeholder="e.g. Priya Sharma"
+            placeholder="e.g. User Name"
             autoComplete="off"
             className={`w-full px-3 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-[#00c9b1] ${t.input} ${formErr.name ? "border-[#f87171]" : ""}`}/>
           {formErr.name && <p className="text-[#f87171] text-xs mt-1">{formErr.name}</p>}
@@ -5988,7 +6061,7 @@ const InviteFormModal = ({ t, dark, title, form, setForm, formErr, onSave, onClo
             type="email"
             value={form.email}
             onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-            placeholder="e.g. priya@smca.in"
+            placeholder="e.g. user@example.com"
             autoComplete="off"
             className={`w-full px-3 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-[#00c9b1] ${t.input} ${formErr.email ? "border-[#f87171]" : ""}`}/>
           {formErr.email && <p className="text-[#f87171] text-xs mt-1">{formErr.email}</p>}
@@ -6201,12 +6274,12 @@ const SmtpConfigPanel = ({ t, dark, smtpCfg, setSmtpCfg, onClose }) => {
             <div>
               <label className={`text-xs font-semibold uppercase tracking-wide ${t.textMuted} mb-1.5 block`}>Sender Email (From) *</label>
               <input value={cfg.fromEmail} onChange={e => setCfg(c=>({...c,fromEmail:e.target.value}))}
-                placeholder="noreply@smca.in" className={inp}/>
+                placeholder="noreply@example.com" className={inp}/>
             </div>
             <div>
               <label className={`text-xs font-semibold uppercase tracking-wide ${t.textMuted} mb-1.5 block`}>Sender Display Name</label>
               <input value={cfg.fromName} onChange={e => setCfg(c=>({...c,fromName:e.target.value}))}
-                placeholder="ProCAS – SMCA" className={inp}/>
+                placeholder="ProCAS" className={inp}/>
             </div>
           </div>
 
@@ -6470,7 +6543,7 @@ const SendInviteBanner = ({ t, dark, userId, users, onSend, onLater, inviteLog, 
               </div>
               <div className="flex gap-2 text-[11px]">
                 <span className={`font-bold w-10 shrink-0 ${t.textMuted}`}>From:</span>
-                <span className={t.text}>{smtpCfg?.fromEmail || "noreply@procas.smca.in"}</span>
+                <span className={t.text}>{smtpCfg?.fromEmail || "noreply@procas.example.com"}</span>
               </div>
               <div className="flex gap-2 text-[11px]">
                 <span className={`font-bold w-10 shrink-0 ${t.textMuted}`}>Subj:</span>
@@ -6488,7 +6561,7 @@ const SendInviteBanner = ({ t, dark, userId, users, onSend, onLater, inviteLog, 
                   Activate Account
                 </span><br/><br/>
                 <span className="opacity-70" style={{color:"#4a90d9"}}>
-                  https://procas.smca.in/activate?token={token}
+                  https://procas.example.com/activate?token={token}
                 </span>
               </div>
             </div>
@@ -6667,13 +6740,13 @@ const UserDatabaseTab = ({ t, dark, isAdmin }) => {
         username: "",
         password: "",
         fromEmail: "",
-        fromName:  "ProCAS – SMCA",
+        fromName:  "ProCAS",
         tls: true,
         configured: false,
       };
     } catch {
       return { provider:"sendgrid", host:"", port:587, username:"", password:"",
-               fromEmail:"", fromName:"ProCAS – SMCA", tls:true, configured:false };
+               fromEmail:"", fromName:"ProCAS", tls:true, configured:false };
     }
   });
   useEffect(() => {
@@ -6695,8 +6768,8 @@ const UserDatabaseTab = ({ t, dark, isAdmin }) => {
   const downloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
       ["Name of User *", "Email ID *", "Role", "Assigned Clients"],
-      ["Rahul Sharma",   "rahul@abc.com",  "End User", "Client A, Client B"],
-      ["Priya Mehta",    "priya@abc.com",  "Admin",    "All Clients"],
+      ["User A",   "usera@example.com",  "End User", "Client Alpha, Client Beta"],
+      ["User B",   "userb@example.com",  "Admin",    "All Clients"],
     ]);
     ws["!cols"] = [22, 26, 12, 30].map(w => ({ wch: w }));
     const wb = XLSX.utils.book_new();
@@ -6923,9 +6996,9 @@ const UserDatabaseTab = ({ t, dark, isAdmin }) => {
 
   const exportReminderHistory = () => {
     const ws = XLSX.utils.json_to_sheet(reminderHistory.map((r,i)=>({
-      "#":i+1,"User Name":r.userName,"Email":r.email,"Module":r.module,
+      "#":i+1,"User Name":xlsSafe(r.userName),"Email":xlsSafe(r.email),"Module":r.module,
       "FY":r.fy,"Month":r.month,"Type":r.type,
-      "Sent By":r.sentBy,"Sent Date & Time":r.sentAt,"Status":r.status,
+      "Sent By":xlsSafe(r.sentBy),"Sent Date & Time":r.sentAt,"Status":r.status,
     })));
     ws["!cols"]=[4,20,26,14,12,12,16,16,20,10].map(w=>({wch:w}));
     const wb=XLSX.utils.book_new();
@@ -6941,13 +7014,13 @@ const UserDatabaseTab = ({ t, dark, isAdmin }) => {
         return {
           "#":                i + 1,
           "User ID":          u.id,
-          "User Name":        u.name,
-          "Email ID":         u.email,
+          "User Name":        xlsSafe(u.name),
+          "Email ID":         xlsSafe(u.email),
           "Role":             u.role,
           "Status":           status,
           "Invite Status":    logEntry.deliveryStatus || "Not Sent",
-          "Last Login":       u.lastLogin || "—",
-          "Joined":           u.joined    || "—",
+          "Last Login":       xlsSafe(u.lastLogin || "—"),
+          "Joined":           xlsSafe(u.joined    || "—"),
           "Assigned Clients": Array.isArray(u.assignedClients)
             ? u.assignedClients.join(", ")
             : (u.assignedClients || "All Clients"),
@@ -8168,14 +8241,14 @@ const UserDatabaseTab = ({ t, dark, isAdmin }) => {
                       </thead>
                       <tbody>
                         <tr className={t.tableRow}>
-                          <td className="px-3 py-2">Rahul Sharma</td>
-                          <td className="px-3 py-2">rahul@abc.com</td>
+                          <td className="px-3 py-2">User A</td>
+                          <td className="px-3 py-2">usera@example.com</td>
                           <td className="px-3 py-2">End User</td>
-                          <td className="px-3 py-2">Client A, Client B</td>
+                          <td className="px-3 py-2">Client Alpha, Client Beta</td>
                         </tr>
                         <tr className={t.tableRow}>
-                          <td className="px-3 py-2">Priya Mehta</td>
-                          <td className="px-3 py-2">priya@abc.com</td>
+                          <td className="px-3 py-2">User B</td>
+                          <td className="px-3 py-2">userb@example.com</td>
                           <td className="px-3 py-2">Admin</td>
                           <td className="px-3 py-2">All Clients</td>
                         </tr>
@@ -8475,8 +8548,8 @@ const SettingsTab = ({ t, dark, darkMode, setDarkMode, isAdmin, setIsAdmin }) =>
         <h3 className={`font-bold text-sm ${t.text} pt-4 pb-2`}>System Information</h3>
         {[
           ["Platform",  "ProCAS v1.0.0"],
-          ["Firm",      "Sharma & Mehta Chartered Accountants LLP"],
-          ["ICAI Reg.", "123456W"],
+          ["Firm",      "Your Organisation Name"],
+          ["ICAI Reg.", "XXXXXX"],
           ["FY Active", "2026-27"],
           ["Data Mode", "In-memory (Demo)"],
         ].map(([k,v]) => (
@@ -8556,7 +8629,7 @@ const MonthLockControl = ({ t, dark, isAdmin, adminName }) => {
   const exportAudit = () => {
     const ws = XLSX.utils.json_to_sheet(auditLog.map(e=>({
       "Action":e.action,"Module":e.module,"Financial Year":e.fy,"Month":e.month,
-      "By":e.by,"Date & Time":new Date(e.at).toLocaleString("en-IN"),
+      "By":xlsSafe(e.by),"Date & Time":new Date(e.at).toLocaleString("en-IN"),
     })));
     const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Lock Audit");
     XLSX.writeFile(wb,"ProCAS_Lock_Audit.xlsx");
@@ -8859,12 +8932,12 @@ const SystemAuditLog = ({ t, dark }) => {
 
   // Merge lock audit with synthetic demo entries
   const [demoEntries] = useState(() => [
-    { action:"USER_LOGIN",    user:"Priya Sharma",  module:"System",       at:new Date(Date.now()-3600000).toISOString(),    remarks:"Admin login" },
-    { action:"DATA_ENTRY",    user:"Rahul Verma",   module:"CAS MIS",      at:new Date(Date.now()-7200000).toISOString(),    remarks:"April MIS data" },
-    { action:"DATA_EDIT",     user:"Sunita Patel",  module:"KRA/KPI",      at:new Date(Date.now()-10800000).toISOString(),   remarks:"Score updated" },
-    { action:"USER_CREATED",  user:"Priya Sharma",  module:"User Database", at:new Date(Date.now()-86400000).toISOString(),  remarks:"New user Arjun added" },
-    { action:"CLIENT_IMPORT", user:"Priya Sharma",  module:"Client Master", at:new Date(Date.now()-172800000).toISOString(), remarks:"12 clients imported" },
-    { action:"DATA_DELETE",   user:"Rahul Verma",   module:"Fund Request",  at:new Date(Date.now()-259200000).toISOString(), remarks:"June entry removed" },
+    { action:"USER_LOGIN",    user:"Admin User",  module:"System",        at:new Date(Date.now()-3600000).toISOString(),    remarks:"Admin login" },
+    { action:"DATA_ENTRY",    user:"User A",      module:"CAS MIS",       at:new Date(Date.now()-7200000).toISOString(),    remarks:"April MIS data" },
+    { action:"DATA_EDIT",     user:"User B",      module:"KRA/KPI",       at:new Date(Date.now()-10800000).toISOString(),   remarks:"Score updated" },
+    { action:"USER_CREATED",  user:"Admin User",  module:"User Database", at:new Date(Date.now()-86400000).toISOString(),   remarks:"New user added" },
+    { action:"CLIENT_IMPORT", user:"Admin User",  module:"Client Master", at:new Date(Date.now()-172800000).toISOString(),  remarks:"12 clients imported" },
+    { action:"DATA_DELETE",   user:"User A",      module:"Fund Request",  at:new Date(Date.now()-259200000).toISOString(),  remarks:"June entry removed" },
   ]);
 
   const allEntries = [
@@ -8896,7 +8969,7 @@ const SystemAuditLog = ({ t, dark }) => {
   const exportAudit = () => {
     const ws = XLSX.utils.json_to_sheet(filtered.map(e=>({
       "Date & Time": new Date(e.at).toLocaleString("en-IN"),
-      "User": e.user, "Module": e.module, "Action": e.action, "Remarks": e.remarks,
+      "User": xlsSafe(e.user), "Module": e.module, "Action": e.action, "Remarks": xlsSafe(e.remarks),
     })));
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Audit Log");
     XLSX.writeFile(wb,"ProCAS_Audit_Log.xlsx");
@@ -9450,6 +9523,7 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
   // ── OVERVIEW ──────────────────────────────────────────────────────────────
   const OverviewSection = () => (
     <div className="space-y-5">
+      {/* Hero banner */}
       <div className="rounded-2xl p-6 relative overflow-hidden"
         style={{ background:"linear-gradient(135deg,#00a89618,#1b5fa818)",
                  border:"1px solid #00a89630" }}>
@@ -9460,19 +9534,19 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
             <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl"
               style={{ background:"linear-gradient(135deg,#00a896,#1b5fa8)" }}>🏗</div>
             <div>
-              <h2 className={`font-black text-xl ${t.text}`}>ProCAS — Backend Architecture</h2>
-              <p className={`text-xs ${t.textMuted}`}>Full-stack design reference · v1.0 · Production-ready</p>
+              <h2 className={`font-black text-xl ${t.text}`}>ProCAS — Platform Architecture Overview</h2>
+              <p className={`text-xs ${t.textMuted}`}>Complete application reference · v2.0 · All modules documented</p>
             </div>
-            {["API-First","RBAC","Audit-logged","Docker-ready"].map(b=>(
+            {["7 Modules","RBAC","Audit-logged","Month Lock","Analytics"].map(b=>(
               <Chip key={b} label={b} color="#00c9b1"/>
             ))}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label:"Frontend",  value:"React + Next.js",   color:"#00c9b1" },
-              { label:"Backend",   value:"Node.js + REST API", color:"#34d399" },
-              { label:"Database",  value:"PostgreSQL 15",     color:"#4a90d9" },
-              { label:"Auth",      value:"JWT + RBAC",        color:"#fbbf24" },
+              { label:"Frontend",  value:"React 18 SPA",        color:"#00c9b1" },
+              { label:"Hosting",   value:"Netlify (Static)",     color:"#34d399" },
+              { label:"Storage",   value:"localStorage (UAT)",   color:"#fbbf24" },
+              { label:"Auth",      value:"RBAC · Role-based",    color:"#f87171" },
             ].map(s=>(
               <div key={s.label} className={`${t.card} border ${t.cardBorder} rounded-xl p-3`}>
                 <div className={`text-[10px] font-bold uppercase tracking-widest ${t.textMuted}`}>{s.label}</div>
@@ -9483,69 +9557,143 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[
-          { icon:"📦", title:"Modular Monorepo",  color:"#00c9b1",
-            desc:"Separate apps/web, apps/api, packages/shared. Scales to microservices without restructuring." },
-          { icon:"🔌", title:"API-First Design",   color:"#34d399",
-            desc:"Every data operation goes through typed REST endpoints. Frontend never touches the DB directly." },
-          { icon:"🔒", title:"Role-Based Access",  color:"#f87171",
-            desc:"JWT carries role claims. Auth middleware enforces admin vs user on every protected route." },
-          { icon:"📊", title:"Excel Pipeline",     color:"#fbbf24",
-            desc:"Multer receives file → SheetJS parses → validation layer → bulk upsert with duplicate detection." },
-          { icon:"📋", title:"Audit Trail",        color:"#4a90d9",
-            desc:"Every write logs actor, timestamp and old/new diff to audit_log for compliance." },
-          { icon:"🗄️", title:"Scalable Schema",   color:"#a78bfa",
-            desc:"UUID primary keys, generated inr_amount column, partial indexes, soft-delete, UTC timestamps." },
-        ].map(c=>(
-          <div key={c.title}
-            className={`${t.card} border ${t.cardBorder} rounded-2xl p-5
-              hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200`}>
-            <div className="text-2xl mb-3">{c.icon}</div>
-            <h3 className="font-bold text-sm mb-1.5" style={{color:c.color}}>{c.title}</h3>
-            <p className={`text-xs leading-relaxed ${t.textMuted}`}>{c.desc}</p>
-          </div>
-        ))}
-      </div>
-
+      {/* Module map */}
       <Card>
-        <CardHeader title="📁 Project Directory Structure"/>
+        <CardHeader title="🗺 Application Module Map — All 7 Modules"/>
+        <div className="p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { icon:"📊", title:"Dashboard", color:"#00c9b1",
+                features:["Executive KPI scorecards","CAS MIS analytics panel","KRA/KPI analytics panel","Fund Request analytics panel","Cross-module data aggregation"],
+                desc:"Unified executive view aggregating live data from all operational modules into one CFO-level dashboard." },
+              { icon:"🏢", title:"Client Master", color:"#34d399",
+                features:["Client registry with Sector & State","Multi-user assignment per client","Bulk Excel import with validation","Import result summary with error log","Client sync to all operational modules"],
+                desc:"Central client registry. Every operational module (CAS MIS, KRA/KPI, Fund Request) references clients defined here." },
+              { icon:"📋", title:"CAS MIS", color:"#4a90d9",
+                features:["Monthly MIS date compliance tracking","Outstanding dues per SPOC","Collection status monitoring","Statutory health tracking (PT/TDS/PF/ESI/GST)","Revenue mix & reconciliation analytics"],
+                desc:"Monthly compliance and revenue tracking per client. Tracks MIS dates, statutory obligations, and collection status." },
+              { icon:"🎯", title:"KRA / KPI", color:"#a78bfa",
+                features:["Per-client KPI scoring (6 parameters)","MYSA compliance tracking","Rectification & escalation monitoring","Raksha tool compliance","CapitallWant & Capital tracking"],
+                desc:"Key Result Area tracking across all clients. Per-parameter applicability flags control which KPIs apply to each client." },
+              { icon:"💰", title:"Fund Request", color:"#fb923c",
+                features:["Multi-currency foreign fund tracking","Auto INR calculation (fc × rate)","Fund analytics: currency breakdown, trends","Funding ledger with variance analysis","Per-row Month Lock enforcement"],
+                desc:"Tracks inward fund requests per client with automatic INR conversion, analytics, and governance controls." },
+              { icon:"👥", title:"User Database", color:"#f87171",
+                features:["User CRUD with role assignment","Client assignment per End User","3-step invite email simulation","Invite log with retry & status","Active/Inactive status management"],
+                desc:"Manages platform users. Admin assigns clients to End Users, controlling which records each user can edit." },
+              { icon:"🏗", title:"Architect", color:"#22d3ee",
+                features:["Month Lock Control (FY/Month/Module)","Auto Reminder management","System Audit Log with export","Master Settings (FY/States/Sectors/Currencies)","System Health Dashboard"],
+                desc:"Admin-only control centre for governance, locks, reminders, audit log review, and master data configuration." },
+            ].map(c=>(
+              <div key={c.title}
+                className={`${t.card} border ${t.cardBorder} rounded-2xl p-5 flex flex-col gap-3
+                  hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200`}
+                style={{borderColor:c.color+"30"}}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                    style={{background:c.color+"18"}}>{c.icon}</div>
+                  <div>
+                    <h3 className="font-bold text-sm" style={{color:c.color}}>{c.title}</h3>
+                  </div>
+                </div>
+                <p className={`text-[11px] leading-relaxed ${t.textMuted}`}>{c.desc}</p>
+                <ul className="space-y-1">
+                  {c.features.map(f=>(
+                    <li key={f} className={`text-[11px] flex items-start gap-2 ${t.textMuted}`}>
+                      <span style={{color:c.color}} className="shrink-0 mt-0.5">▸</span>{f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Architecture principles */}
+      <Card>
+        <CardHeader title="⚙️ Architecture Principles"/>
+        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { icon:"🔒", title:"Role-Based Access Control",  color:"#f87171",
+              desc:"Admin has full access. End Users can only edit their assigned clients. View-only badge shown for unassigned clients across CAS MIS, KRA/KPI, and Fund Request." },
+            { icon:"🔐", title:"Month Lock Governance",       color:"#fbbf24",
+              desc:"Admin can lock any FY/Month/Module combination. Locked months disable all Add, Save, and Delete actions for all users including Admin." },
+            { icon:"📋", title:"Audit Trail",                 color:"#4a90d9",
+              desc:"Every lock/unlock action is recorded in the audit log with actor, timestamp, module, FY, and month. Exportable to Excel." },
+            { icon:"🔔", title:"Auto Reminder Framework",     color:"#a78bfa",
+              desc:"Admin configures scheduled reminders per module. Reminders are managed centrally in Architect → Reminders with status tracking." },
+            { icon:"📊", title:"Unified Analytics Layer",     color:"#00c9b1",
+              desc:"CAS MIS, KRA/KPI, and Fund Request each have dedicated analytics tabs. Dashboard aggregates all three into executive KPI scorecards and charts." },
+            { icon:"🗄️", title:"Client-Centric Data Model",  color:"#34d399",
+              desc:"Client Master is the root entity. Every CAS MIS record, KRA/KPI entry, and Fund Request row references a client ID. User assignments flow from Client Master." },
+          ].map(c=>(
+            <div key={c.title} className={`${t.card} border ${t.cardBorder} rounded-xl p-4`}>
+              <div className="text-xl mb-2">{c.icon}</div>
+              <h3 className="font-bold text-xs mb-1.5" style={{color:c.color}}>{c.title}</h3>
+              <p className={`text-[11px] leading-relaxed ${t.textMuted}`}>{c.desc}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Directory structure */}
+      <Card>
+        <CardHeader title="📁 Project Directory Structure (Production Target)"/>
         <div className="p-5">
           <BashBlock lines={[
-            "ca-dashboard/",
+            "procas/",
             "├── apps/",
-            "│   ├── web/                  ← Next.js 14 (App Router)",
+            "│   ├── web/                       ← React 18 SPA (current: single JSX file)",
             "│   │   ├── app/",
             "│   │   │   ├── (dashboard)/",
-            "│   │   │   │   ├── master/   ← Master Client Data page",
-            "│   │   │   │   ├── fund/     ← Fund Request page",
-            "│   │   │   │   └── layout    ← Sidebar shell",
-            "│   │   │   └── auth/         ← Login / register",
+            "│   │   │   │   ├── overview/      ← Executive Dashboard",
+            "│   │   │   │   ├── clients/       ← Client Master",
+            "│   │   │   │   ├── cas-mis/       ← CAS MIS module",
+            "│   │   │   │   ├── kra-kpi/       ← KRA/KPI module",
+            "│   │   │   │   ├── fund/          ← Fund Request module",
+            "│   │   │   │   ├── users/         ← User Database module",
+            "│   │   │   │   ├── architect/     ← Architect / Admin module",
+            "│   │   │   │   └── layout        ← Sidebar shell + RBAC provider",
+            "│   │   │   └── auth/              ← Login / register",
             "│   │   ├── components/",
-            "│   │   │   ├── ui/           ← Design system components",
-            "│   │   │   ├── master/       ← Master Client components",
-            "│   │   │   └── fund/         ← Fund Request components",
+            "│   │   │   ├── ui/                ← Design system components",
+            "│   │   │   ├── clients/           ← Client Master components",
+            "│   │   │   ├── cas-mis/           ← CAS MIS table + analytics",
+            "│   │   │   ├── kra-kpi/           ← KRA/KPI table + analytics",
+            "│   │   │   ├── fund/              ← Fund Request components",
+            "│   │   │   ├── users/             ← User management components",
+            "│   │   │   └── architect/         ← Lock, Reminder, Audit components",
             "│   │   └── lib/",
-            "│   │       ├── api.ts        ← Typed HTTP client",
-            "│   │       └── auth.ts       ← Auth helpers + token refresh",
+            "│   │       ├── api.ts             ← Typed HTTP client",
+            "│   │       ├── auth.ts            ← Auth helpers + token refresh",
+            "│   │       └── rbac.ts            ← useRBAC hook + canEditClient()",
             "│   │",
-            "│   └── api/                  ← REST API server",
+            "│   └── api/                       ← REST API server (Node.js)",
             "│       └── src/",
             "│           ├── routes/",
-            "│           │   ├── clients   ← CRUD + bulk import",
-            "│           │   ├── fund      ← Fund request CRUD",
-            "│           │   └── auth      ← Login / refresh / logout",
+            "│           │   ├── auth           ← Login / refresh / logout",
+            "│           │   ├── clients        ← CRUD + bulk import + export",
+            "│           │   ├── cas-mis        ← Monthly MIS CRUD + analytics",
+            "│           │   ├── kra-kpi        ← KPI CRUD + analytics",
+            "│           │   ├── fund-requests  ← Fund CRUD + analytics + export",
+            "│           │   ├── users          ← User CRUD + invite + assignment",
+            "│           │   ├── month-locks    ← Lock / unlock / audit",
+            "│           │   ├── reminders      ← Schedule / trigger / manage",
+            "│           │   └── master         ← FY / States / Sectors / Currencies",
             "│           ├── middleware/",
-            "│           │   ├── authenticate  ← Token verification",
-            "│           │   └── authorize     ← Role guard",
+            "│           │   ├── authenticate   ← JWT token verification",
+            "│           │   └── authorize      ← Role + client-assignment guard",
             "│           ├── services/",
-            "│           │   ├── excel         ← SheetJS + validation",
-            "│           │   └── audit         ← Audit log writer",
+            "│           │   ├── excel          ← SheetJS import/export",
+            "│           │   ├── email          ← SMTP invite delivery",
+            "│           │   ├── audit          ← Audit log writer",
+            "│           │   └── scheduler      ← Reminder cron engine",
             "│           └── db/",
-            "│               ├── pool          ← Connection pool singleton",
-            "│               └── migrations/   ← SQL DDL files",
+            "│               ├── pool           ← Connection pool singleton",
+            "│               └── migrations/    ← SQL DDL files (all tables)",
             "│",
-            "├── packages/shared/          ← Shared TypeScript types",
+            "├── packages/shared/               ← Shared TypeScript types",
             "├── docker-compose.yml",
             "└── .env.example",
           ]}/>
@@ -9557,100 +9705,294 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
   // ── SCHEMA ────────────────────────────────────────────────────────────────
   const SchemaSection = () => (
     <div className="space-y-5">
+      {/* ── Users ── */}
       <TableSchema name="users" color="#00c9b1"
         rows={[
-          { col:"id",            type:"UUID",         constraint:"PK · auto-generated", desc:"Primary key",          pk:true },
-          { col:"email",         type:"VARCHAR(255)",  constraint:"NOT NULL · UNIQUE",   desc:"Login email"                  },
-          { col:"password_hash", type:"TEXT",          constraint:"NOT NULL",            desc:"Hashed password"              },
-          { col:"full_name",     type:"VARCHAR(255)",  constraint:"NOT NULL",            desc:"Display name"                 },
-          { col:"role",          type:"VARCHAR(20)",   constraint:"DEFAULT user",        desc:"admin or user"                },
-          { col:"is_active",     type:"BOOLEAN",       constraint:"DEFAULT true",        desc:"Soft disable flag"            },
-          { col:"created_at",    type:"TIMESTAMPTZ",   constraint:"DEFAULT NOW()",       desc:"Account creation time"        },
-          { col:"updated_at",    type:"TIMESTAMPTZ",   constraint:"DEFAULT NOW()",       desc:"Last profile update"          },
+          { col:"id",            type:"UUID",         constraint:"PK · auto-generated",  desc:"Primary key",                pk:true },
+          { col:"email",         type:"VARCHAR(255)", constraint:"NOT NULL · UNIQUE",     desc:"Login email address"                  },
+          { col:"password_hash", type:"TEXT",         constraint:"NOT NULL",              desc:"Hashed password"                      },
+          { col:"full_name",     type:"VARCHAR(255)", constraint:"NOT NULL",              desc:"Display name"                         },
+          { col:"role",          type:"VARCHAR(20)",  constraint:"CHECK admin|user",      desc:"Admin or End User"                    },
+          { col:"is_active",     type:"BOOLEAN",      constraint:"DEFAULT true",          desc:"Active / Inactive status"             },
+          { col:"invite_status", type:"VARCHAR(20)",  constraint:"pending|sent|accepted", desc:"Invite workflow state"                },
+          { col:"invite_token",  type:"TEXT",         constraint:"nullable",              desc:"Secure invite token (HMAC-SHA256)"    },
+          { col:"invite_sent_at",type:"TIMESTAMPTZ",  constraint:"nullable",              desc:"When invite email was dispatched"     },
+          { col:"created_at",    type:"TIMESTAMPTZ",  constraint:"DEFAULT NOW()",         desc:"Account creation time"                },
+          { col:"updated_at",    type:"TIMESTAMPTZ",  constraint:"DEFAULT NOW()",         desc:"Last profile update"                  },
         ]}/>
 
+      {/* ── Client Master ── */}
       <TableSchema name="client_master" color="#34d399"
         rows={[
-          { col:"id",           type:"UUID",         constraint:"PK · auto-generated", desc:"Primary key",             pk:true },
-          { col:"client_name",  type:"VARCHAR(255)", constraint:"NOT NULL · UNIQUE",   desc:"Company or individual name"      },
-          { col:"person_name",  type:"VARCHAR(255)", constraint:"NOT NULL",            desc:"Primary contact person"          },
-          { col:"is_active",    type:"BOOLEAN",      constraint:"DEFAULT true",        desc:"Soft-delete flag"                },
-          { col:"created_by",   type:"UUID",         constraint:"FK → users.id",       desc:"Admin who created record", fk:true},
-          { col:"created_at",   type:"TIMESTAMPTZ",  constraint:"DEFAULT NOW()",       desc:"Row creation timestamp"          },
-          { col:"updated_at",   type:"TIMESTAMPTZ",  constraint:"DEFAULT NOW()",       desc:"Last modification"               },
+          { col:"id",           type:"UUID",         constraint:"PK · auto-generated",  desc:"Primary key",                pk:true },
+          { col:"client_name",  type:"VARCHAR(255)", constraint:"NOT NULL · UNIQUE",     desc:"Company or individual name"           },
+          { col:"person_name",  type:"VARCHAR(255)", constraint:"NOT NULL",              desc:"Primary contact person"               },
+          { col:"sector",       type:"VARCHAR(100)", constraint:"NOT NULL",              desc:"Business sector"                      },
+          { col:"state",        type:"VARCHAR(100)", constraint:"NOT NULL",              desc:"Indian state"                         },
+          { col:"turnover",     type:"VARCHAR(30)",  constraint:"nullable",              desc:"Turnover label e.g. ₹42.8 Cr"        },
+          { col:"type",         type:"VARCHAR(50)",  constraint:"nullable",              desc:"Client type e.g. HUF, LLP, Pvt Ltd"  },
+          { col:"risk",         type:"VARCHAR(20)",  constraint:"Low|Medium|High",       desc:"Risk classification"                  },
+          { col:"status",       type:"VARCHAR(20)",  constraint:"Active|Inactive",       desc:"Client active status"                 },
+          { col:"rm",           type:"VARCHAR(255)", constraint:"nullable",              desc:"Assigned relationship manager (SPOC)" },
+          { col:"is_active",    type:"BOOLEAN",      constraint:"DEFAULT true",          desc:"Soft-delete flag"                     },
+          { col:"created_by",   type:"UUID",         constraint:"FK → users.id",         desc:"Admin who created record",   fk:true  },
+          { col:"created_at",   type:"TIMESTAMPTZ",  constraint:"DEFAULT NOW()",         desc:"Row creation timestamp"               },
+          { col:"updated_at",   type:"TIMESTAMPTZ",  constraint:"DEFAULT NOW()",         desc:"Last modification"                    },
         ]}
         fkNote="created_by → users(id) ON DELETE SET NULL"/>
 
-      <TableSchema name="fund_requests" color="#4a90d9"
+      {/* ── Client User Assignments ── */}
+      <TableSchema name="client_user_assignments" color="#22d3ee"
         rows={[
-          { col:"id",             type:"UUID",          constraint:"PK · auto-generated",      desc:"Primary key",           pk:true },
-          { col:"client_id",      type:"UUID",          constraint:"FK → client_master.id",    desc:"Client reference",      fk:true },
-          { col:"financial_year", type:"VARCHAR(9)",    constraint:"NOT NULL",                 desc:"e.g. 2026-27"                   },
-          { col:"month",          type:"VARCHAR(15)",   constraint:"NOT NULL",                 desc:"e.g. April"                     },
-          { col:"currency",       type:"VARCHAR(5)",    constraint:"NOT NULL",                 desc:"ISO code: USD, EUR…"            },
-          { col:"foreign_amount", type:"NUMERIC(18,4)", constraint:"CHECK > 0",               desc:"Amount in foreign currency"     },
-          { col:"exchange_rate",  type:"NUMERIC(12,6)", constraint:"CHECK > 0",               desc:"Rate at time of entry"          },
-          { col:"inr_amount",     type:"NUMERIC(20,2)", constraint:"GENERATED ALWAYS AS…",    desc:"Auto-computed INR value"        },
-          { col:"remarks",        type:"TEXT",          constraint:"nullable",                 desc:"Optional notes"                 },
-          { col:"created_by",     type:"UUID",          constraint:"FK → users.id",            desc:"Entry creator",         fk:true },
-          { col:"created_at",     type:"TIMESTAMPTZ",   constraint:"DEFAULT NOW()",            desc:"Row creation timestamp"         },
+          { col:"id",        type:"UUID", constraint:"PK · auto-generated",     desc:"Primary key",                  pk:true },
+          { col:"client_id", type:"UUID", constraint:"FK → client_master.id",   desc:"Client being assigned",        fk:true },
+          { col:"user_id",   type:"UUID", constraint:"FK → users.id",           desc:"End User being assigned",      fk:true },
+          { col:"assigned_by",type:"UUID",constraint:"FK → users.id",           desc:"Admin who made the assignment", fk:true},
+          { col:"created_at",type:"TIMESTAMPTZ",constraint:"DEFAULT NOW()",     desc:"When assignment was made"               },
+        ]}
+        fkNote="UNIQUE(client_id, user_id) · client_id → client_master(id) ON DELETE CASCADE"/>
+
+      {/* ── CAS MIS ── */}
+      <TableSchema name="cas_mis" color="#4a90d9"
+        rows={[
+          { col:"id",              type:"UUID",        constraint:"PK · auto-generated",  desc:"Primary key",                pk:true },
+          { col:"client_id",       type:"UUID",        constraint:"FK → client_master.id",desc:"Client reference",           fk:true },
+          { col:"financial_year",  type:"VARCHAR(9)",  constraint:"NOT NULL",             desc:"e.g. 2026-27"                        },
+          { col:"month",           type:"VARCHAR(15)", constraint:"NOT NULL",             desc:"e.g. April"                          },
+          { col:"mis_date",        type:"DATE",        constraint:"nullable",             desc:"MIS submission date"                  },
+          { col:"outstanding_dues",type:"NUMERIC(18,2)",constraint:"DEFAULT 0",          desc:"Outstanding amount for SPOC"          },
+          { col:"collection_status",type:"VARCHAR(30)",constraint:"nullable",            desc:"Collected / Pending / Partial"        },
+          { col:"collection_amt",  type:"NUMERIC(18,2)",constraint:"DEFAULT 0",          desc:"Amount collected"                     },
+          { col:"recon_gap",       type:"NUMERIC(18,2)",constraint:"DEFAULT 0",          desc:"Reconciliation gap amount"            },
+          { col:"pt_applicable",   type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"Professional Tax applicability"       },
+          { col:"tds_applicable",  type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"TDS applicability"                    },
+          { col:"pf_applicable",   type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"PF applicability"                     },
+          { col:"esi_applicable",  type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"ESI applicability"                    },
+          { col:"gst_applicable",  type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"GST applicability"                    },
+          { col:"software_used",   type:"VARCHAR(100)",constraint:"nullable",            desc:"Accounting software in use"           },
+          { col:"remarks",         type:"TEXT",        constraint:"nullable",             desc:"Additional notes"                     },
+          { col:"created_by",      type:"UUID",        constraint:"FK → users.id",        desc:"Entry creator",              fk:true  },
+          { col:"created_at",      type:"TIMESTAMPTZ", constraint:"DEFAULT NOW()",        desc:"Row creation timestamp"               },
+          { col:"updated_at",      type:"TIMESTAMPTZ", constraint:"DEFAULT NOW()",        desc:"Last modification"                    },
+        ]}
+        fkNote="UNIQUE(client_id, financial_year, month) · client_id → client_master(id) ON DELETE RESTRICT"/>
+
+      {/* ── KRA KPI ── */}
+      <TableSchema name="kra_kpi" color="#a78bfa"
+        rows={[
+          { col:"id",             type:"UUID",        constraint:"PK · auto-generated",  desc:"Primary key",                pk:true },
+          { col:"client_id",      type:"UUID",        constraint:"FK → client_master.id",desc:"Client reference",           fk:true },
+          { col:"financial_year", type:"VARCHAR(9)",  constraint:"NOT NULL",             desc:"e.g. 2026-27"                        },
+          { col:"month",          type:"VARCHAR(15)", constraint:"NOT NULL",             desc:"e.g. April"                          },
+          { col:"mis_date",       type:"DATE",        constraint:"nullable",             desc:"MIS date compliance date"             },
+          { col:"mis_applicable", type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"MIS date KPI applicability"           },
+          { col:"mysa",           type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"MYSA compliance status"               },
+          { col:"mysa_applicable",type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"MYSA KPI applicability"               },
+          { col:"rectification",  type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"Rectification KPI status"             },
+          { col:"rect_applicable",type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"Rectification applicability"          },
+          { col:"escalation",     type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"Escalation status"                    },
+          { col:"esc_applicable", type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"Escalation applicability"             },
+          { col:"raksha",         type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"Raksha tool compliance"               },
+          { col:"raksha_applicable",type:"VARCHAR(3)",constraint:"Y|N|A",              desc:"Raksha applicability"                 },
+          { col:"capitalWant",    type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"CapitallWant status"                  },
+          { col:"cw_applicable",  type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"CapitallWant applicability"           },
+          { col:"capital",        type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"Capital KPI status"                   },
+          { col:"cap_applicable", type:"VARCHAR(3)",  constraint:"Y|N|A",               desc:"Capital applicability"                },
+          { col:"created_by",     type:"UUID",        constraint:"FK → users.id",        desc:"Entry creator",              fk:true  },
+          { col:"created_at",     type:"TIMESTAMPTZ", constraint:"DEFAULT NOW()",        desc:"Row creation timestamp"               },
+          { col:"updated_at",     type:"TIMESTAMPTZ", constraint:"DEFAULT NOW()",        desc:"Last modification"                    },
+        ]}
+        fkNote="UNIQUE(client_id, financial_year, month) · client_id → client_master(id) ON DELETE RESTRICT"/>
+
+      {/* ── Fund Requests ── */}
+      <TableSchema name="fund_requests" color="#fb923c"
+        rows={[
+          { col:"id",             type:"UUID",          constraint:"PK · auto-generated",   desc:"Primary key",           pk:true },
+          { col:"client_id",      type:"UUID",          constraint:"FK → client_master.id", desc:"Client reference",      fk:true },
+          { col:"financial_year", type:"VARCHAR(9)",    constraint:"NOT NULL",              desc:"e.g. 2026-27"                   },
+          { col:"month",          type:"VARCHAR(15)",   constraint:"NOT NULL",              desc:"e.g. April"                     },
+          { col:"currency",       type:"VARCHAR(5)",    constraint:"NOT NULL",              desc:"ISO code: USD, EUR, GBP…"       },
+          { col:"foreign_amount", type:"NUMERIC(18,4)", constraint:"CHECK > 0",            desc:"Amount in foreign currency"     },
+          { col:"exchange_rate",  type:"NUMERIC(12,6)", constraint:"CHECK > 0",            desc:"Rate at time of entry"          },
+          { col:"inr_amount",     type:"NUMERIC(20,2)", constraint:"GENERATED ALWAYS AS…", desc:"Auto-computed INR value"        },
+          { col:"remarks",        type:"TEXT",          constraint:"nullable",              desc:"Optional notes"                 },
+          { col:"created_by",     type:"UUID",          constraint:"FK → users.id",         desc:"Entry creator",         fk:true },
+          { col:"created_at",     type:"TIMESTAMPTZ",   constraint:"DEFAULT NOW()",         desc:"Row creation timestamp"         },
         ]}
         fkNote="client_id → client_master(id) ON DELETE RESTRICT"/>
 
-      <TableSchema name="audit_log" color="#fbbf24"
+      {/* ── Month Locks ── */}
+      <TableSchema name="month_locks" color="#fbbf24"
         rows={[
-          { col:"id",         type:"BIGSERIAL",    constraint:"PK auto-increment",  desc:"Primary key",           pk:true },
-          { col:"table_name", type:"VARCHAR(50)",  constraint:"NOT NULL",           desc:"Affected table name"           },
-          { col:"record_id",  type:"UUID",         constraint:"NOT NULL",           desc:"Affected row ID"               },
-          { col:"action",     type:"VARCHAR(10)",  constraint:"INSERT/UPDATE/DELETE",desc:"Operation type"               },
-          { col:"old_data",   type:"JSONB",        constraint:"nullable",           desc:"Previous row snapshot"         },
-          { col:"new_data",   type:"JSONB",        constraint:"nullable",           desc:"New row snapshot"              },
-          { col:"actor_id",   type:"UUID",         constraint:"FK → users.id",      desc:"User who made change",  fk:true},
-          { col:"acted_at",   type:"TIMESTAMPTZ",  constraint:"DEFAULT NOW()",      desc:"When change occurred"          },
+          { col:"id",             type:"UUID",        constraint:"PK · auto-generated",  desc:"Primary key",              pk:true },
+          { col:"financial_year", type:"VARCHAR(9)",  constraint:"NOT NULL",             desc:"e.g. 2026-27"                      },
+          { col:"month",          type:"VARCHAR(15)", constraint:"NOT NULL",             desc:"e.g. April  (all = entire FY)"    },
+          { col:"module",         type:"VARCHAR(20)", constraint:"cas|kra|fund|all",     desc:"Module being locked"               },
+          { col:"is_locked",      type:"BOOLEAN",     constraint:"DEFAULT false",         desc:"Lock state"                       },
+          { col:"locked_by",      type:"UUID",        constraint:"FK → users.id",         desc:"Admin who locked",         fk:true },
+          { col:"locked_at",      type:"TIMESTAMPTZ", constraint:"nullable",              desc:"When lock was applied"             },
+          { col:"unlocked_by",    type:"UUID",        constraint:"FK → users.id",         desc:"Admin who unlocked",       fk:true },
+          { col:"unlocked_at",    type:"TIMESTAMPTZ", constraint:"nullable",              desc:"When lock was removed"             },
+        ]}
+        fkNote="UNIQUE(financial_year, month, module) · locked_by → users(id) ON DELETE SET NULL"/>
+
+      {/* ── Reminders ── */}
+      <TableSchema name="reminders" color="#34d399"
+        rows={[
+          { col:"id",          type:"UUID",        constraint:"PK · auto-generated",  desc:"Primary key",              pk:true },
+          { col:"title",       type:"VARCHAR(255)",constraint:"NOT NULL",             desc:"Reminder title"                    },
+          { col:"module",      type:"VARCHAR(30)", constraint:"NOT NULL",             desc:"Target module"                     },
+          { col:"frequency",   type:"VARCHAR(20)", constraint:"daily|weekly|monthly", desc:"Recurrence type"                   },
+          { col:"trigger_day", type:"INTEGER",     constraint:"nullable",             desc:"Day of month for trigger"          },
+          { col:"target_role", type:"VARCHAR(20)", constraint:"admin|user|all",       desc:"Who receives the reminder"         },
+          { col:"message",     type:"TEXT",        constraint:"NOT NULL",             desc:"Reminder message body"             },
+          { col:"status",      type:"VARCHAR(20)", constraint:"active|paused",        desc:"Current reminder status"           },
+          { col:"last_sent",   type:"TIMESTAMPTZ", constraint:"nullable",             desc:"Last trigger time"                 },
+          { col:"created_by",  type:"UUID",        constraint:"FK → users.id",         desc:"Admin who created reminder", fk:true},
+          { col:"created_at",  type:"TIMESTAMPTZ", constraint:"DEFAULT NOW()",         desc:"Creation timestamp"                },
         ]}/>
 
+      {/* ── Audit Log ── */}
+      <TableSchema name="audit_log" color="#e2e8f0"
+        rows={[
+          { col:"id",         type:"BIGSERIAL",   constraint:"PK auto-increment",   desc:"Primary key",           pk:true },
+          { col:"table_name", type:"VARCHAR(50)", constraint:"NOT NULL",            desc:"Affected table name"           },
+          { col:"record_id",  type:"UUID",        constraint:"NOT NULL",            desc:"Affected row ID"               },
+          { col:"action",     type:"VARCHAR(20)", constraint:"INSERT|UPDATE|DELETE|LOCK|UNLOCK",desc:"Operation type" },
+          { col:"module",     type:"VARCHAR(30)", constraint:"nullable",            desc:"Module context"                },
+          { col:"old_data",   type:"JSONB",       constraint:"nullable",            desc:"Previous row snapshot"         },
+          { col:"new_data",   type:"JSONB",       constraint:"nullable",            desc:"New row snapshot"              },
+          { col:"actor_id",   type:"UUID",        constraint:"FK → users.id",       desc:"User who made change",  fk:true},
+          { col:"acted_at",   type:"TIMESTAMPTZ", constraint:"DEFAULT NOW()",       desc:"When change occurred"          },
+        ]}/>
+
+      {/* ── Master tables ── */}
       <Card>
-        <CardHeader title="SQL DDL — Core Tables"/>
+        <CardHeader title="📋 Master Data Tables — FY / States / Sectors / Currencies"/>
+        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            { name:"master_fy",         color:"#00c9b1", cols:["id UUID PK","label VARCHAR(9) — e.g. 2026-27","is_active BOOLEAN DEFAULT true","sort_order INTEGER"] },
+            { name:"master_states",     color:"#34d399", cols:["id UUID PK","name VARCHAR(100) NOT NULL UNIQUE","is_active BOOLEAN DEFAULT true"] },
+            { name:"master_sectors",    color:"#4a90d9", cols:["id UUID PK","name VARCHAR(100) NOT NULL UNIQUE","is_active BOOLEAN DEFAULT true"] },
+            { name:"master_currencies", color:"#a78bfa", cols:["id UUID PK","code VARCHAR(5) NOT NULL UNIQUE — e.g. USD","name VARCHAR(100)","is_active BOOLEAN DEFAULT true"] },
+          ].map(mt=>(
+            <div key={mt.name} className="rounded-xl border p-4" style={{borderColor:mt.color+"40"}}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full" style={{background:mt.color}}/>
+                <span className="font-black text-sm" style={{color:mt.color}}>{mt.name}</span>
+              </div>
+              <ul className="space-y-1">
+                {mt.cols.map(c=>(
+                  <li key={c} className={`text-[11px] font-mono ${t.textMuted}`}>▸ {c}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* ── DDL ── */}
+      <Card>
+        <CardHeader title="SQL DDL — Complete Table Set"/>
         <div className="p-5">
           <SqlBlock lines={[
             "-- Enable UUID generation",
             "CREATE EXTENSION IF NOT EXISTS pgcrypto;",
             "",
-            "-- Users table",
+            "-- 1. Users",
             "CREATE TABLE users (",
             "  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
             "  email         VARCHAR(255) NOT NULL UNIQUE,",
             "  password_hash TEXT NOT NULL,",
             "  full_name     VARCHAR(255) NOT NULL,",
-            "  role          VARCHAR(20)  NOT NULL DEFAULT 'user'",
+            "  role          VARCHAR(20) NOT NULL DEFAULT 'user'",
             "                  CHECK (role IN ('admin','user')),",
             "  is_active     BOOLEAN NOT NULL DEFAULT true,",
+            "  invite_status VARCHAR(20) DEFAULT 'pending',",
+            "  invite_token  TEXT,",
+            "  invite_sent_at TIMESTAMPTZ,",
             "  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),",
             "  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()",
             ");",
             "",
-            "-- Client Master",
+            "-- 2. Client Master",
             "CREATE TABLE client_master (",
             "  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
             "  client_name  VARCHAR(255) NOT NULL UNIQUE,",
             "  person_name  VARCHAR(255) NOT NULL,",
+            "  sector       VARCHAR(100) NOT NULL,",
+            "  state        VARCHAR(100) NOT NULL,",
+            "  turnover     VARCHAR(30),",
+            "  type         VARCHAR(50),",
+            "  risk         VARCHAR(20) CHECK (risk IN ('Low','Medium','High')),",
+            "  status       VARCHAR(20) DEFAULT 'Active',",
+            "  rm           VARCHAR(255),",
             "  is_active    BOOLEAN NOT NULL DEFAULT true,",
             "  created_by   UUID REFERENCES users(id) ON DELETE SET NULL,",
             "  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),",
             "  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()",
             ");",
-            "CREATE INDEX idx_client_name   ON client_master(client_name);",
-            "CREATE INDEX idx_client_active ON client_master(is_active)",
-            "  WHERE is_active = true;",
             "",
-            "-- Fund Requests",
+            "-- 3. Client–User Assignments",
+            "CREATE TABLE client_user_assignments (",
+            "  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+            "  client_id   UUID NOT NULL REFERENCES client_master(id) ON DELETE CASCADE,",
+            "  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,",
+            "  assigned_by UUID REFERENCES users(id) ON DELETE SET NULL,",
+            "  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),",
+            "  UNIQUE (client_id, user_id)",
+            ");",
+            "",
+            "-- 4. CAS MIS",
+            "CREATE TABLE cas_mis (",
+            "  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+            "  client_id        UUID NOT NULL REFERENCES client_master(id) ON DELETE RESTRICT,",
+            "  financial_year   VARCHAR(9) NOT NULL,",
+            "  month            VARCHAR(15) NOT NULL,",
+            "  mis_date         DATE,",
+            "  outstanding_dues NUMERIC(18,2) DEFAULT 0,",
+            "  collection_status VARCHAR(30),",
+            "  collection_amt   NUMERIC(18,2) DEFAULT 0,",
+            "  recon_gap        NUMERIC(18,2) DEFAULT 0,",
+            "  pt_applicable    VARCHAR(3) CHECK (pt_applicable IN ('Y','N','A')),",
+            "  tds_applicable   VARCHAR(3) CHECK (tds_applicable IN ('Y','N','A')),",
+            "  pf_applicable    VARCHAR(3) CHECK (pf_applicable IN ('Y','N','A')),",
+            "  esi_applicable   VARCHAR(3) CHECK (esi_applicable IN ('Y','N','A')),",
+            "  gst_applicable   VARCHAR(3) CHECK (gst_applicable IN ('Y','N','A')),",
+            "  software_used    VARCHAR(100),",
+            "  remarks          TEXT,",
+            "  created_by       UUID REFERENCES users(id) ON DELETE SET NULL,",
+            "  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),",
+            "  updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),",
+            "  UNIQUE (client_id, financial_year, month)",
+            ");",
+            "",
+            "-- 5. KRA / KPI",
+            "CREATE TABLE kra_kpi (",
+            "  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+            "  client_id        UUID NOT NULL REFERENCES client_master(id) ON DELETE RESTRICT,",
+            "  financial_year   VARCHAR(9) NOT NULL,",
+            "  month            VARCHAR(15) NOT NULL,",
+            "  mis_date         DATE,",
+            "  mis_applicable   VARCHAR(3), mysa VARCHAR(3), mysa_applicable VARCHAR(3),",
+            "  rectification    VARCHAR(3), rect_applicable VARCHAR(3),",
+            "  escalation       VARCHAR(3), esc_applicable  VARCHAR(3),",
+            "  raksha           VARCHAR(3), raksha_applicable VARCHAR(3),",
+            "  capitalWant      VARCHAR(3), cw_applicable   VARCHAR(3),",
+            "  capital          VARCHAR(3), cap_applicable  VARCHAR(3),",
+            "  created_by       UUID REFERENCES users(id) ON DELETE SET NULL,",
+            "  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),",
+            "  updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),",
+            "  UNIQUE (client_id, financial_year, month)",
+            ");",
+            "",
+            "-- 6. Fund Requests",
             "CREATE TABLE fund_requests (",
             "  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
-            "  client_id       UUID NOT NULL",
-            "                    REFERENCES client_master(id) ON DELETE RESTRICT,",
-            "  financial_year  VARCHAR(9)    NOT NULL,",
-            "  month           VARCHAR(15)   NOT NULL,",
-            "  currency        VARCHAR(5)    NOT NULL,",
+            "  client_id       UUID NOT NULL REFERENCES client_master(id) ON DELETE RESTRICT,",
+            "  financial_year  VARCHAR(9) NOT NULL,",
+            "  month           VARCHAR(15) NOT NULL,",
+            "  currency        VARCHAR(5) NOT NULL,",
             "  foreign_amount  NUMERIC(18,4) NOT NULL CHECK (foreign_amount > 0),",
             "  exchange_rate   NUMERIC(12,6) NOT NULL CHECK (exchange_rate > 0),",
             "  inr_amount      NUMERIC(20,2) GENERATED ALWAYS AS",
@@ -9659,9 +10001,51 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
             "  created_by      UUID REFERENCES users(id) ON DELETE SET NULL,",
             "  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()",
             ");",
-            "CREATE INDEX idx_fr_client   ON fund_requests(client_id);",
-            "CREATE INDEX idx_fr_fy_month ON fund_requests(financial_year, month);",
-            "CREATE INDEX idx_fr_currency ON fund_requests(currency);",
+            "",
+            "-- 7. Month Locks",
+            "CREATE TABLE month_locks (",
+            "  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+            "  financial_year VARCHAR(9) NOT NULL,",
+            "  month          VARCHAR(15) NOT NULL,",
+            "  module         VARCHAR(20) NOT NULL CHECK (module IN ('cas','kra','fund','all')),",
+            "  is_locked      BOOLEAN NOT NULL DEFAULT false,",
+            "  locked_by      UUID REFERENCES users(id) ON DELETE SET NULL,",
+            "  locked_at      TIMESTAMPTZ,",
+            "  unlocked_by    UUID REFERENCES users(id) ON DELETE SET NULL,",
+            "  unlocked_at    TIMESTAMPTZ,",
+            "  UNIQUE (financial_year, month, module)",
+            ");",
+            "",
+            "-- 8. Reminders",
+            "CREATE TABLE reminders (",
+            "  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+            "  title       VARCHAR(255) NOT NULL,",
+            "  module      VARCHAR(30) NOT NULL,",
+            "  frequency   VARCHAR(20) CHECK (frequency IN ('daily','weekly','monthly')),",
+            "  trigger_day INTEGER,",
+            "  target_role VARCHAR(20) DEFAULT 'all',",
+            "  message     TEXT NOT NULL,",
+            "  status      VARCHAR(20) DEFAULT 'active',",
+            "  last_sent   TIMESTAMPTZ,",
+            "  created_by  UUID REFERENCES users(id) ON DELETE SET NULL,",
+            "  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()",
+            ");",
+            "",
+            "-- 9. Audit Log",
+            "CREATE TABLE audit_log (",
+            "  id         BIGSERIAL PRIMARY KEY,",
+            "  table_name VARCHAR(50) NOT NULL,",
+            "  record_id  UUID NOT NULL,",
+            "  action     VARCHAR(20) NOT NULL,",
+            "  module     VARCHAR(30),",
+            "  old_data   JSONB,",
+            "  new_data   JSONB,",
+            "  actor_id   UUID REFERENCES users(id) ON DELETE SET NULL,",
+            "  acted_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()",
+            ");",
+            "CREATE INDEX idx_audit_actor  ON audit_log(actor_id);",
+            "CREATE INDEX idx_audit_table  ON audit_log(table_name);",
+            "CREATE INDEX idx_audit_action ON audit_log(action);",
           ]}/>
         </div>
       </Card>
@@ -9676,7 +10060,7 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
         <div className="p-5 space-y-2">
           <ApiRoute method="POST" path="/api/auth/login"   desc="Get JWT tokens" auth="user"
             reqFields={[{name:"email",type:"string",desc:"User email address"},{name:"password",type:"string",desc:"Plain text password"}]}
-            resFields={[{name:"access_token",type:"string",desc:"Short-lived JWT (1h)"},{name:"refresh_token",type:"string",desc:"Long-lived token (7d)"},{name:"user.role",type:"string",desc:"admin or user"}]}/>
+            resFields={[{name:"access_token",type:"string",desc:"Short-lived JWT (1h)"},{name:"refresh_token",type:"string",desc:"Long-lived token (7d)"},{name:"user.role",type:"string",desc:"admin or user"},{name:"user.assignedClients",type:"array",desc:"Client IDs this user can edit"}]}/>
           <ApiRoute method="POST" path="/api/auth/refresh" desc="Rotate access token" auth="user"
             reqFields={[{name:"refresh_token",type:"string",desc:"Current refresh token"}]}
             resFields={[{name:"access_token",type:"string",desc:"New access token"},{name:"expires_in",type:"number",desc:"Seconds until expiry"}]}/>
@@ -9689,24 +10073,102 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
       <Card>
         <CardHeader title="👥 Client Master  —  /api/clients"/>
         <div className="p-5 space-y-2">
-          <ApiRoute method="GET"    path="/api/clients"        desc="List all (paginated)" auth="user"
+          <ApiRoute method="GET"    path="/api/clients"               desc="List all (paginated)" auth="user"
             reqFields={null}
-            resFields={[{name:"data[]",type:"array",desc:"Client objects"},{name:"total",type:"number",desc:"Total count"},{name:"page",type:"number",desc:"Current page"}]}/>
-          <ApiRoute method="GET"    path="/api/clients/:id"    desc="Get single client" auth="user"
+            resFields={[{name:"data[]",type:"array",desc:"Client objects with sector, state, assigned users"},{name:"total",type:"number",desc:"Total count"},{name:"page",type:"number",desc:"Current page"}]}/>
+          <ApiRoute method="GET"    path="/api/clients/:id"           desc="Get single client" auth="user"
             reqFields={null}
-            resFields={[{name:"id",type:"UUID",desc:"Client identifier"},{name:"client_name",type:"string",desc:"Company name"},{name:"person_name",type:"string",desc:"Contact person"}]}/>
-          <ApiRoute method="POST"   path="/api/clients"        desc="Create client" auth="admin"
-            reqFields={[{name:"client_name",type:"string",desc:"Company or individual name"},{name:"person_name",type:"string",desc:"Primary contact"}]}
+            resFields={[{name:"id",type:"UUID",desc:"Client identifier"},{name:"client_name",type:"string",desc:"Company name"},{name:"sector",type:"string",desc:"Business sector"},{name:"state",type:"string",desc:"Indian state"},{name:"assignedUsers",type:"array",desc:"Assigned user IDs"}]}/>
+          <ApiRoute method="POST"   path="/api/clients"               desc="Create client" auth="admin"
+            reqFields={[{name:"client_name",type:"string",desc:"Company or individual name"},{name:"person_name",type:"string",desc:"Primary contact"},{name:"sector",type:"string",desc:"Business sector"},{name:"state",type:"string",desc:"Indian state"},{name:"assignedUserIds",type:"array",desc:"User IDs to assign"}]}
             resFields={[{name:"id",type:"UUID",desc:"New client ID"},{name:"created_at",type:"timestamp",desc:"Creation time"}]}/>
-          <ApiRoute method="PUT"    path="/api/clients/:id"    desc="Update client" auth="admin"
-            reqFields={[{name:"client_name",type:"string",desc:"Updated name"},{name:"person_name",type:"string",desc:"Updated contact"}]}
+          <ApiRoute method="PUT"    path="/api/clients/:id"           desc="Update client" auth="admin"
+            reqFields={[{name:"client_name",type:"string",desc:"Updated name"},{name:"sector",type:"string",desc:"Updated sector"},{name:"state",type:"string",desc:"Updated state"},{name:"assignedUserIds",type:"array",desc:"Updated user assignments"}]}
             resFields={[{name:"id",type:"UUID",desc:"Client ID"},{name:"updated_at",type:"timestamp",desc:"Update time"}]}/>
-          <ApiRoute method="DELETE" path="/api/clients/:id"    desc="Soft-delete" auth="admin"
+          <ApiRoute method="DELETE" path="/api/clients/:id"           desc="Soft-delete" auth="admin"
             reqFields={null}
             resFields={[{name:"message",type:"string",desc:"Confirmation"},{name:"id",type:"UUID",desc:"Deleted ID"}]}/>
-          <ApiRoute method="POST"   path="/api/clients/import" desc="Bulk Excel import" auth="admin"
-            reqFields={[{name:"file",type:"multipart",desc:".xlsx or .csv upload"},{name:"financial_year",type:"string",desc:"Optional FY tag"}]}
+          <ApiRoute method="POST"   path="/api/clients/import"        desc="Bulk Excel import" auth="admin"
+            reqFields={[{name:"file",type:"multipart",desc:".xlsx or .csv upload"}]}
             resFields={[{name:"imported",type:"number",desc:"New rows added"},{name:"updated",type:"number",desc:"Existing rows updated"},{name:"duplicates",type:"number",desc:"Skipped rows"},{name:"errors[]",type:"array",desc:"Row-level errors"}]}/>
+          <ApiRoute method="GET"    path="/api/clients/export"        desc="Export to Excel" auth="user"
+            reqFields={null}
+            resFields={[{name:"file",type:"binary",desc:".xlsx stream download"}]}/>
+          <ApiRoute method="PUT"    path="/api/clients/:id/assign"    desc="Update user assignments" auth="admin"
+            reqFields={[{name:"userIds",type:"array",desc:"Array of user IDs to assign to this client"}]}
+            resFields={[{name:"assignments",type:"array",desc:"Updated assignment list"}]}/>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader title="👤 User Database  —  /api/users"/>
+        <div className="p-5 space-y-2">
+          <ApiRoute method="GET"    path="/api/users"              desc="List all users" auth="admin"
+            reqFields={null}
+            resFields={[{name:"data[]",type:"array",desc:"User objects with role and invite status"},{name:"total",type:"number",desc:"Total count"}]}/>
+          <ApiRoute method="POST"   path="/api/users"              desc="Create user" auth="admin"
+            reqFields={[{name:"full_name",type:"string",desc:"Display name"},{name:"email",type:"string",desc:"Login email"},{name:"role",type:"string",desc:"admin or user"},{name:"assignedClientIds",type:"array",desc:"Client IDs to assign"}]}
+            resFields={[{name:"id",type:"UUID",desc:"New user ID"},{name:"invite_token",type:"string",desc:"Token for activation link"}]}/>
+          <ApiRoute method="PUT"    path="/api/users/:id"          desc="Update user" auth="admin"
+            reqFields={[{name:"full_name",type:"string",desc:"Updated name"},{name:"role",type:"string",desc:"Updated role"},{name:"is_active",type:"boolean",desc:"Active status"},{name:"assignedClientIds",type:"array",desc:"Updated client assignments"}]}
+            resFields={[{name:"id",type:"UUID",desc:"User ID"},{name:"updated_at",type:"timestamp",desc:"Update time"}]}/>
+          <ApiRoute method="DELETE" path="/api/users/:id"          desc="Deactivate user" auth="admin"
+            reqFields={null}
+            resFields={[{name:"message",type:"string",desc:"Confirmation"}]}/>
+          <ApiRoute method="POST"   path="/api/users/:id/invite"   desc="Send / resend invite" auth="admin"
+            reqFields={[{name:"email",type:"string",desc:"Target email address"}]}
+            resFields={[{name:"invite_token",type:"string",desc:"HMAC-SHA256 signed token"},{name:"sent_at",type:"timestamp",desc:"Dispatch time"}]}/>
+          <ApiRoute method="POST"   path="/api/users/activate"     desc="Activate account via token" auth="user"
+            reqFields={[{name:"token",type:"string",desc:"Invite token from email"},{name:"password",type:"string",desc:"Chosen password"}]}
+            resFields={[{name:"message",type:"string",desc:"Activation confirmation"}]}/>
+          <ApiRoute method="POST"   path="/api/users/import"       desc="Bulk user import" auth="admin"
+            reqFields={[{name:"file",type:"multipart",desc:".xlsx with user records"}]}
+            resFields={[{name:"imported",type:"number",desc:"Users created"},{name:"errors[]",type:"array",desc:"Row-level errors"}]}/>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader title="📋 CAS MIS  —  /api/cas-mis"/>
+        <div className="p-5 space-y-2">
+          <ApiRoute method="GET"    path="/api/cas-mis"           desc="List records (paginated)" auth="user"
+            reqFields={null}
+            resFields={[{name:"data[]",type:"array",desc:"CAS MIS records"},{name:"total",type:"number",desc:"Total matching"}]}/>
+          <ApiRoute method="GET"    path="/api/cas-mis/analytics" desc="Analytics aggregates" auth="user"
+            reqFields={null}
+            resFields={[{name:"revenue_mix[]",type:"array",desc:"Revenue by sector"},{name:"outstanding_spoc[]",type:"array",desc:"Dues by SPOC"},{name:"statutory_health[]",type:"array",desc:"Y/N/A breakdown per statutory type"},{name:"collection_timeline[]",type:"array",desc:"Monthly collection delay trend"}]}/>
+          <ApiRoute method="POST"   path="/api/cas-mis"           desc="Create / update MIS record" auth="user"
+            reqFields={[{name:"client_id",type:"UUID",desc:"Client reference"},{name:"financial_year",type:"string",desc:"e.g. 2026-27"},{name:"month",type:"string",desc:"e.g. April"},{name:"mis_date",type:"date",desc:"MIS submission date"},{name:"outstanding_dues",type:"number",desc:"Outstanding amount"},{name:"pt_applicable",type:"string",desc:"Y/N/A"},{name:"tds_applicable",type:"string",desc:"Y/N/A"}]}
+            resFields={[{name:"id",type:"UUID",desc:"Record ID"},{name:"created_at",type:"timestamp",desc:"Creation time"}]}/>
+          <ApiRoute method="PUT"    path="/api/cas-mis/:id"       desc="Update MIS record" auth="user"
+            reqFields={[{name:"mis_date",type:"date",desc:"Updated MIS date"},{name:"collection_status",type:"string",desc:"Updated status"},{name:"remarks",type:"string",desc:"Updated notes"}]}
+            resFields={[{name:"id",type:"UUID",desc:"Record ID"},{name:"updated_at",type:"timestamp",desc:"Update time"}]}/>
+          <ApiRoute method="GET"    path="/api/cas-mis/export"    desc="Export to Excel" auth="user"
+            reqFields={null}
+            resFields={[{name:"file",type:"binary",desc:".xlsx stream download"}]}/>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader title="🎯 KRA / KPI  —  /api/kra-kpi"/>
+        <div className="p-5 space-y-2">
+          <ApiRoute method="GET"    path="/api/kra-kpi"           desc="List records (paginated)" auth="user"
+            reqFields={null}
+            resFields={[{name:"data[]",type:"array",desc:"KRA/KPI records with all parameter values"},{name:"total",type:"number",desc:"Total matching"}]}/>
+          <ApiRoute method="GET"    path="/api/kra-kpi/analytics" desc="KPI analytics aggregates" auth="user"
+            reqFields={null}
+            resFields={[{name:"param_scores[]",type:"array",desc:"Score % per KPI parameter"},{name:"client_heatmap[]",type:"array",desc:"Compliance matrix per client"},{name:"escalation_trend[]",type:"array",desc:"Monthly escalation count"}]}/>
+          <ApiRoute method="POST"   path="/api/kra-kpi"           desc="Create / update KPI record" auth="user"
+            reqFields={[{name:"client_id",type:"UUID",desc:"Client reference"},{name:"financial_year",type:"string",desc:"e.g. 2026-27"},{name:"month",type:"string",desc:"e.g. April"},{name:"mysa",type:"string",desc:"Y/N/A"},{name:"rectification",type:"string",desc:"Y/N/A"},{name:"escalation",type:"string",desc:"Y/N/A"},{name:"raksha",type:"string",desc:"Y/N/A"},{name:"capitalWant",type:"string",desc:"Y/N/A"},{name:"capital",type:"string",desc:"Y/N/A"}]}
+            resFields={[{name:"id",type:"UUID",desc:"Record ID"},{name:"created_at",type:"timestamp",desc:"Creation time"}]}/>
+          <ApiRoute method="PUT"    path="/api/kra-kpi/:id"       desc="Update KPI record" auth="user"
+            reqFields={[{name:"mysa",type:"string",desc:"Updated Y/N/A"},{name:"escalation",type:"string",desc:"Updated Y/N/A"},{name:"raksha",type:"string",desc:"Updated Y/N/A"}]}
+            resFields={[{name:"id",type:"UUID",desc:"Record ID"},{name:"updated_at",type:"timestamp",desc:"Update time"}]}/>
+          <ApiRoute method="PATCH"  path="/api/kra-kpi/:id/applicability" desc="Toggle KPI applicability" auth="admin"
+            reqFields={[{name:"parameter",type:"string",desc:"KPI parameter name e.g. mysa"},{name:"applicable",type:"string",desc:"Y/N/A"}]}
+            resFields={[{name:"id",type:"UUID",desc:"Record ID"},{name:"updated_at",type:"timestamp",desc:"Update time"}]}/>
+          <ApiRoute method="GET"    path="/api/kra-kpi/export"    desc="Export to Excel" auth="user"
+            reqFields={null}
+            resFields={[{name:"file",type:"binary",desc:".xlsx stream download"}]}/>
         </div>
       </Card>
 
@@ -9718,11 +10180,11 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
             resFields={[{name:"data[]",type:"array",desc:"Fund request objects"},{name:"total",type:"number",desc:"Total matching"},{name:"page",type:"number",desc:"Current page"}]}/>
           <ApiRoute method="GET"    path="/api/fund-requests/analytics"  desc="Chart aggregates" auth="user"
             reqFields={null}
-            resFields={[{name:"currency_breakdown[]",type:"array",desc:"INR by currency"},{name:"monthly_trend[]",type:"array",desc:"INR by month"},{name:"top_clients[]",type:"array",desc:"Ranked by INR"}]}/>
-          <ApiRoute method="POST"   path="/api/fund-requests"            desc="Create entry" auth="admin"
+            resFields={[{name:"currency_breakdown[]",type:"array",desc:"INR by currency"},{name:"monthly_trend[]",type:"array",desc:"INR by month"},{name:"top_clients[]",type:"array",desc:"Ranked by INR total"}]}/>
+          <ApiRoute method="POST"   path="/api/fund-requests"            desc="Create entry" auth="user"
             reqFields={[{name:"client_id",type:"UUID",desc:"Client reference"},{name:"financial_year",type:"string",desc:"e.g. 2026-27"},{name:"month",type:"string",desc:"e.g. April"},{name:"currency",type:"string",desc:"ISO code"},{name:"foreign_amount",type:"number",desc:"Amount in foreign ccy"},{name:"exchange_rate",type:"number",desc:"Rate at entry time"}]}
             resFields={[{name:"id",type:"UUID",desc:"New entry ID"},{name:"inr_amount",type:"number",desc:"Auto-calculated INR"},{name:"created_at",type:"timestamp",desc:"Creation time"}]}/>
-          <ApiRoute method="PUT"    path="/api/fund-requests/:id"        desc="Update entry" auth="admin"
+          <ApiRoute method="PUT"    path="/api/fund-requests/:id"        desc="Update entry" auth="user"
             reqFields={[{name:"foreign_amount",type:"number",desc:"Updated amount"},{name:"exchange_rate",type:"number",desc:"Updated rate"},{name:"remarks",type:"string",desc:"Updated notes"}]}
             resFields={[{name:"id",type:"UUID",desc:"Entry ID"},{name:"inr_amount",type:"number",desc:"Recalculated INR"}]}/>
           <ApiRoute method="DELETE" path="/api/fund-requests/:id"        desc="Delete entry" auth="admin"
@@ -9731,6 +10193,81 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
           <ApiRoute method="GET"    path="/api/fund-requests/export"     desc="Download Excel" auth="user"
             reqFields={null}
             resFields={[{name:"file",type:"binary",desc:".xlsx stream download"}]}/>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader title="🔒 Month Lock  —  /api/month-locks"/>
+        <div className="p-5 space-y-2">
+          <ApiRoute method="GET"    path="/api/month-locks"              desc="Get lock status grid" auth="admin"
+            reqFields={null}
+            resFields={[{name:"locks[]",type:"array",desc:"Lock records per FY/Month/Module"},{name:"audit[]",type:"array",desc:"Recent lock audit entries"}]}/>
+          <ApiRoute method="POST"   path="/api/month-locks/lock"         desc="Lock a FY/Month/Module" auth="admin"
+            reqFields={[{name:"financial_year",type:"string",desc:"e.g. 2026-27"},{name:"month",type:"string",desc:"e.g. April"},{name:"module",type:"string",desc:"cas | kra | fund | all"}]}
+            resFields={[{name:"lock",type:"object",desc:"Lock record created"},{name:"audit_id",type:"number",desc:"Audit log entry ID"}]}/>
+          <ApiRoute method="POST"   path="/api/month-locks/unlock"       desc="Unlock a FY/Month/Module" auth="admin"
+            reqFields={[{name:"financial_year",type:"string",desc:"e.g. 2026-27"},{name:"month",type:"string",desc:"e.g. April"},{name:"module",type:"string",desc:"cas | kra | fund | all"}]}
+            resFields={[{name:"lock",type:"object",desc:"Updated lock record"},{name:"audit_id",type:"number",desc:"Audit log entry ID"}]}/>
+          <ApiRoute method="POST"   path="/api/month-locks/bulk-lock"    desc="Lock all months in a FY" auth="admin"
+            reqFields={[{name:"financial_year",type:"string",desc:"e.g. 2026-27"},{name:"module",type:"string",desc:"cas | kra | fund | all"}]}
+            resFields={[{name:"locked_count",type:"number",desc:"Number of months locked"}]}/>
+          <ApiRoute method="GET"    path="/api/month-locks/audit"        desc="Audit log for lock events" auth="admin"
+            reqFields={null}
+            resFields={[{name:"entries[]",type:"array",desc:"Lock/unlock audit events with actor and timestamp"}]}/>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader title="🔔 Reminders  —  /api/reminders"/>
+        <div className="p-5 space-y-2">
+          <ApiRoute method="GET"    path="/api/reminders"           desc="List all reminders" auth="admin"
+            reqFields={null}
+            resFields={[{name:"data[]",type:"array",desc:"Reminder records with status and last_sent"}]}/>
+          <ApiRoute method="POST"   path="/api/reminders"           desc="Create reminder" auth="admin"
+            reqFields={[{name:"title",type:"string",desc:"Reminder title"},{name:"module",type:"string",desc:"Target module"},{name:"frequency",type:"string",desc:"daily|weekly|monthly"},{name:"trigger_day",type:"number",desc:"Day of month (for monthly)"},{name:"target_role",type:"string",desc:"admin|user|all"},{name:"message",type:"string",desc:"Reminder body"}]}
+            resFields={[{name:"id",type:"UUID",desc:"New reminder ID"}]}/>
+          <ApiRoute method="PUT"    path="/api/reminders/:id"       desc="Update reminder" auth="admin"
+            reqFields={[{name:"title",type:"string",desc:"Updated title"},{name:"frequency",type:"string",desc:"Updated frequency"},{name:"status",type:"string",desc:"active|paused"}]}
+            resFields={[{name:"id",type:"UUID",desc:"Reminder ID"},{name:"updated_at",type:"timestamp",desc:"Update time"}]}/>
+          <ApiRoute method="DELETE" path="/api/reminders/:id"       desc="Delete reminder" auth="admin"
+            reqFields={null}
+            resFields={[{name:"message",type:"string",desc:"Confirmation"}]}/>
+          <ApiRoute method="POST"   path="/api/reminders/:id/trigger" desc="Manually trigger reminder" auth="admin"
+            reqFields={null}
+            resFields={[{name:"sent_count",type:"number",desc:"Number of notifications dispatched"},{name:"triggered_at",type:"timestamp",desc:"Trigger time"}]}/>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader title="⚙️ Master Settings  —  /api/master"/>
+        <div className="p-5 space-y-2">
+          <ApiRoute method="GET"    path="/api/master/fy"           desc="List financial years" auth="user"
+            reqFields={null}
+            resFields={[{name:"data[]",type:"array",desc:"FY list e.g. 2026-27"}]}/>
+          <ApiRoute method="POST"   path="/api/master/fy"           desc="Add financial year" auth="admin"
+            reqFields={[{name:"label",type:"string",desc:"e.g. 2027-28"}]}
+            resFields={[{name:"id",type:"UUID",desc:"New FY record ID"}]}/>
+          <ApiRoute method="GET"    path="/api/master/states"       desc="List states" auth="user"
+            reqFields={null}
+            resFields={[{name:"data[]",type:"array",desc:"Indian state list"}]}/>
+          <ApiRoute method="GET"    path="/api/master/sectors"      desc="List sectors" auth="user"
+            reqFields={null}
+            resFields={[{name:"data[]",type:"array",desc:"Business sector list"}]}/>
+          <ApiRoute method="GET"    path="/api/master/currencies"   desc="List currencies" auth="user"
+            reqFields={null}
+            resFields={[{name:"data[]",type:"array",desc:"Currency codes e.g. USD, EUR, GBP"}]}/>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader title="📊 Dashboard Analytics  —  /api/dashboard"/>
+        <div className="p-5 space-y-2">
+          <ApiRoute method="GET" path="/api/dashboard/summary" desc="Executive KPI summary" auth="user"
+            reqFields={null}
+            resFields={[{name:"total_clients",type:"number",desc:"Active client count"},{name:"cas_revenue",type:"number",desc:"Total expected CAS revenue"},{name:"cas_collected",type:"number",desc:"Amount collected"},{name:"kpi_score",type:"number",desc:"Overall KPI compliance %"},{name:"fund_inward",type:"number",desc:"Total fund inward INR"}]}/>
+          <ApiRoute method="GET" path="/api/dashboard/analytics" desc="Cross-module chart data" auth="user"
+            reqFields={null}
+            resFields={[{name:"revenue_mix[]",type:"array",desc:"Revenue by sector (CAS MIS)"},{name:"kra_heatmap[]",type:"array",desc:"KPI compliance heatmap"},{name:"fund_trend[]",type:"array",desc:"Fund inflow monthly trend"},{name:"top_clients[]",type:"array",desc:"Top clients by fund volume"}]}/>
         </div>
       </Card>
 
@@ -9752,9 +10289,11 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
                 ["financial_year","string", `financial_year=${DEFAULT_FY}`,"Filter by FY"],
                 ["month",         "string", "month=April",           "Filter by month name"],
                 ["client_id",     "uuid",   "client_id=uuid",        "Filter by client"],
+                ["module",        "string", "module=cas",            "Filter by module (lock routes)"],
                 ["currency",      "string", "currency=USD",          "Filter by currency code"],
                 ["search",        "string", "search=Agarwal",        "Full-text search"],
                 ["sort",          "string", "sort=created_at:desc",  "Sort field + direction"],
+                ["status",        "string", "status=active",         "Filter by status (reminders/users)"],
               ].map(([p,type,ex,desc])=>(
                 <tr key={p} className={`${t.tableRow} transition-colors`}>
                   <td className="px-4 py-2.5"><code className="font-mono" style={{color:"#fbbf24"}}>{p}</code></td>
@@ -9773,60 +10312,178 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
   // ── ROLES ─────────────────────────────────────────────────────────────────
   const RolesSection = () => (
     <div className="space-y-5">
+      {/* Role cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Admin */}
         <div className={`${t.card} border rounded-2xl p-5`} style={{borderColor:"#34d39940"}}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl text-xl flex items-center justify-center"
               style={{background:"#34d39918"}}>👑</div>
             <div>
               <div className="font-black text-sm" style={{color:"#34d399"}}>Admin Role</div>
-              <div className={`text-xs ${t.textMuted}`}>Full read + write access</div>
+              <div className={`text-xs ${t.textMuted}`}>Full read + write access across all modules</div>
             </div>
           </div>
           <ul className="space-y-2">
-            {["Create, edit, delete clients","Bulk import clients via Excel",
-              "Create, edit, delete fund requests","Export fund requests to Excel",
-              "View all analytics & charts","Manage user accounts","Access full audit log",
+            {[
+              "Access all 7 modules: Dashboard, Client Master, CAS MIS, KRA/KPI, Fund Request, User Database, Architect",
+              "Create, edit, delete clients (including sector, state, user assignment)",
+              "Bulk import clients via Excel",
+              "Create, edit, delete CAS MIS records for all clients",
+              "Create, edit, delete KRA/KPI records for all clients",
+              "Create, edit, delete Fund Request entries for all clients",
+              "Manage user accounts: create, edit, deactivate, assign clients",
+              "Send and resend invite emails to users",
+              "Lock and unlock any FY / Month / Module combination",
+              "Create, edit, pause, delete auto reminders",
+              "View full System Audit Log and export to Excel",
+              "Configure Master Settings: FY, States, Sectors, Currencies",
+              "View System Health Dashboard",
+              "View all analytics and charts across all modules",
             ].map(p=>(
-              <li key={p} className={`text-xs flex items-center gap-2 ${t.text}`}>
-                <span style={{color:"#34d399"}}>✓</span>{p}
+              <li key={p} className={`text-xs flex items-start gap-2 ${t.text}`}>
+                <span style={{color:"#34d399"}} className="shrink-0 mt-0.5">✓</span>{p}
               </li>
             ))}
           </ul>
         </div>
 
+        {/* End User */}
         <div className={`${t.card} border rounded-2xl p-5`} style={{borderColor:"#00c9b140"}}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl text-xl flex items-center justify-center"
               style={{background:"#00c9b118"}}>👤</div>
             <div>
-              <div className="font-black text-sm" style={{color:"#00c9b1"}}>User (Viewer) Role</div>
-              <div className={`text-xs ${t.textMuted}`}>Read-only access</div>
+              <div className="font-black text-sm" style={{color:"#00c9b1"}}>End User Role</div>
+              <div className={`text-xs ${t.textMuted}`}>Edit assigned clients · View all · No admin controls</div>
             </div>
           </div>
           <ul className="space-y-2">
-            {[["View client list",true],["View fund requests",true],
-              ["View analytics & charts",true],["Export to Excel",true],
-              ["Create / edit clients",false],["Import Excel",false],
-              ["Delete any record",false],["Access audit log",false],
+            {[
+              ["View Dashboard and all analytics charts", true],
+              ["View full Client Master list (all clients)", true],
+              ["Edit CAS MIS records for assigned clients only", true],
+              ["Edit KRA/KPI records for assigned clients only", true],
+              ["Create / edit Fund Request entries for assigned clients only", true],
+              ["View CAS MIS, KRA/KPI, Fund records for unassigned clients (read-only badge)", true],
+              ["Export data to Excel (all modules)", true],
+              ["View own profile", true],
+              ["Create or delete clients", false],
+              ["Manage user accounts or send invites", false],
+              ["Lock or unlock any month", false],
+              ["Create or manage reminders", false],
+              ["Access System Audit Log", false],
+              ["Modify Master Settings", false],
+              ["Access Architect module", false],
             ].map(([p,ok])=>(
-              <li key={p} className={`text-xs flex items-center gap-2 ${ok?t.text:t.textMuted}`}>
-                <span style={{color:ok?"#00c9b1":"#f87171"}}>{ok?"✓":"✗"}</span>{p}
+              <li key={p} className={`text-xs flex items-start gap-2 ${ok?t.text:t.textMuted}`}>
+                <span style={{color:ok?"#00c9b1":"#f87171"}} className="shrink-0 mt-0.5">{ok?"✓":"✗"}</span>{p}
               </li>
             ))}
           </ul>
         </div>
       </div>
 
+      {/* User-Client Assignment */}
+      <Card>
+        <CardHeader title="🔗 User–Client Assignment Model"/>
+        <div className="p-5 space-y-4">
+          <p className={`text-xs leading-relaxed ${t.textMuted}`}>
+            Each End User has an <code className="font-mono" style={{color:"#fbbf24"}}>assignedClients[]</code> array.
+            Admin users have <code className="font-mono" style={{color:"#fbbf24"}}>assignedClients = null</code> (meaning all clients).
+            The <code className="font-mono" style={{color:"#fbbf24"}}>useRBAC()</code> hook derives edit permissions at runtime:
+          </p>
+          <div className="rounded-xl overflow-hidden mt-2" style={{background:"#0d1117"}}>
+            <pre className="px-4 py-4 text-[11px] font-mono overflow-x-auto leading-relaxed text-[#94a3b8]">
+{`const useRBAC = () => {
+  const { activeUser } = useContext(UserContext);
+  const isAdmin = activeUser?.role === "Admin";
+
+  // Admin → null means all clients allowed
+  // End User → array of assigned client IDs
+  const assignedClientIds = isAdmin
+    ? null
+    : (activeUser?.assignedClients || []);
+
+  // canEdit(clientId) → true if user can write to this client
+  const canEdit = (clientId) =>
+    isAdmin || assignedClientIds.includes(clientId);
+
+  return { isAdmin, activeUser, canEdit, assignedClientIds };
+};`}
+            </pre>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+            {[
+              { icon:"✏️", label:"Edit row", color:"#34d399",
+                desc:"Shown when canEdit(clientId) = true. User is Admin or client is in their assigned list." },
+              { icon:"👁", label:"View Only badge", color:"#00c9b1",
+                desc:"Shown for unassigned clients. Row is visible but all Save, Add, Delete buttons are hidden." },
+              { icon:"🔒", label:"Month Locked", color:"#fbbf24",
+                desc:"Even if canEdit = true, a locked month disables all write actions for all users including Admin." },
+            ].map(b=>(
+              <div key={b.label} className="rounded-xl p-4 border"
+                style={{background:b.color+"0a",borderColor:b.color+"30"}}>
+                <div className="text-xl mb-2">{b.icon}</div>
+                <div className="font-bold text-xs mb-1" style={{color:b.color}}>{b.label}</div>
+                <div className={`text-[11px] leading-relaxed ${t.textMuted}`}>{b.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* User Access Matrix */}
+      <Card>
+        <CardHeader title="📋 User Access Matrix — Module × Permission"/>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className={`${t.tableHead} text-[10px] uppercase tracking-wider`}>
+                {["Module","Admin — View","Admin — Edit","End User — View","End User — Edit"].map(h=>(
+                  <th key={h} className={`px-3 py-2.5 text-left font-bold border-b ${t.cardBorder}`}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className={`divide-y ${t.divider}`}>
+              {[
+                ["Dashboard",       "✓ All","— (read-only)","✓ All","— (read-only)"],
+                ["Client Master",   "✓ All","✓ Full CRUD","✓ All (view)","✗ No edit"],
+                ["CAS MIS",         "✓ All","✓ All clients","✓ All (view)","✓ Assigned only"],
+                ["KRA / KPI",       "✓ All","✓ All clients","✓ All (view)","✓ Assigned only"],
+                ["Fund Request",    "✓ All","✓ All clients","✓ All (view)","✓ Assigned only"],
+                ["User Database",   "✓ All","✓ Full CRUD + Invite","✗ No access","✗ No access"],
+                ["Architect",       "✓ All","✓ Full control","✗ No access","✗ No access"],
+                ["Month Lock",      "✓ Status","✓ Lock/Unlock","✗","✗"],
+                ["Reminders",       "✓ All","✓ Full CRUD","✗","✗"],
+                ["Audit Log",       "✓ All","—","✗","✗"],
+                ["Master Settings", "✓ All","✓ Full CRUD","✗","✗"],
+              ].map(([mod,...cells])=>(
+                <tr key={mod} className={`${t.tableRow} transition-colors`}>
+                  <td className={`px-3 py-2.5 font-bold text-[11px] ${t.text}`}>{mod}</td>
+                  {cells.map((c,i)=>(
+                    <td key={i} className={`px-3 py-2.5 text-[11px] ${t.textMuted}`}
+                      style={{color:c.startsWith("✓")?"#34d399":c.startsWith("✗")?"#f87171":undefined}}>
+                      {c}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* JWT Flow */}
       <Card>
         <CardHeader title="JWT Authentication Flow"/>
         <div className="p-5 space-y-3">
           {[
-            { step:1, icon:"🔑", title:"User submits credentials",   desc:"POST /api/auth/login with email + password",             color:"#00c9b1" },
-            { step:2, icon:"🛡️", title:"Server validates password",  desc:"Hash comparison, user status check, role lookup",         color:"#34d399" },
-            { step:3, icon:"📤", title:"Issue JWT tokens",           desc:"Access token (1h) + Refresh token (7d) returned to client", color:"#fbbf24" },
-            { step:4, icon:"📋", title:"Client sends Bearer token",  desc:"Authorization: Bearer <access_token> header on each request", color:"#4a90d9" },
-            { step:5, icon:"✅", title:"Middleware verifies + authorizes", desc:"Validates signature, checks expiry, confirms role matches route guard", color:"#a78bfa" },
+            { step:1, icon:"🔑", title:"User submits credentials",        desc:"POST /api/auth/login with email + password",                                          color:"#00c9b1" },
+            { step:2, icon:"🛡️", title:"Server validates password",       desc:"Hash comparison, user status check, role lookup, assignedClients fetched from DB",    color:"#34d399" },
+            { step:3, icon:"📤", title:"Issue JWT tokens",                desc:"Access token (1h) + Refresh token (7d) + assignedClients[] returned to client",       color:"#fbbf24" },
+            { step:4, icon:"📋", title:"Client sends Bearer token",       desc:"Authorization: Bearer <access_token> header on each API request",                    color:"#4a90d9" },
+            { step:5, icon:"✅", title:"Middleware verifies + authorizes", desc:"Validates signature, checks expiry, confirms role, checks client assignment for row-level access", color:"#a78bfa" },
           ].map(s=>(
             <div key={s.step} className="flex items-start gap-4 p-3 rounded-xl"
               style={{background:s.color+"0f",border:`1px solid ${s.color}25`}}>
@@ -9841,18 +10498,21 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
         </div>
       </Card>
 
+      {/* Security Checklist */}
       <Card>
         <CardHeader title="Security Checklist"/>
         <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
-            { icon:"🔐", label:"Password Hashing",  value:"Hashed with cost factor 12",              color:"#34d399" },
-            { icon:"⏱",  label:"Token Expiry",      value:"Access 1h · Refresh 7d · Rotation",       color:"#00c9b1" },
-            { icon:"🛡️", label:"Rate Limiting",     value:"100 req/min per IP via middleware",        color:"#fbbf24" },
-            { icon:"✅", label:"Input Validation",   value:"Schema validation on every route",         color:"#4a90d9" },
-            { icon:"🗄️", label:"SQL Safety",        value:"Parameterised queries, no string concat",  color:"#34d399" },
-            { icon:"🌐", label:"CORS",               value:"Whitelist frontend origin only",           color:"#a78bfa" },
-            { icon:"⛑️", label:"HTTP Headers",       value:"Security headers middleware enabled",      color:"#f87171" },
-            { icon:"📋", label:"Audit Log",          value:"All writes tracked with before/after diff",color:"#fbbf24" },
+            { icon:"🔐", label:"Password Hashing",    value:"bcrypt with cost factor 12",                color:"#34d399" },
+            { icon:"⏱",  label:"Token Expiry",        value:"Access 1h · Refresh 7d · Rotation",         color:"#00c9b1" },
+            { icon:"🛡️", label:"Rate Limiting",       value:"100 req/min per IP via middleware",          color:"#fbbf24" },
+            { icon:"✅", label:"Input Validation",     value:"Schema validation on every route",           color:"#4a90d9" },
+            { icon:"🗄️", label:"SQL Safety",          value:"Parameterised queries, no string concat",    color:"#34d399" },
+            { icon:"🌐", label:"CORS",                 value:"Whitelist frontend origin only",             color:"#a78bfa" },
+            { icon:"⛑️", label:"HTTP Headers",         value:"Helmet.js security headers enabled",         color:"#f87171" },
+            { icon:"📋", label:"Audit Log",            value:"All writes tracked with before/after diff",  color:"#fbbf24" },
+            { icon:"🔗", label:"Invite Token Security",value:"HMAC-SHA256 signed tokens (replace btoa())", color:"#f87171" },
+            { icon:"🔒", label:"Month Lock Override",  value:"Locked months block writes even for Admin",  color:"#fbbf24" },
           ].map(s=>(
             <div key={s.label} className="flex items-center gap-3 p-3 rounded-xl"
               style={{background:s.color+"0f",border:`1px solid ${s.color}25`}}>
@@ -9871,25 +10531,114 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
   // ── STACK ─────────────────────────────────────────────────────────────────
   const StackSection = () => (
     <div className="space-y-5">
+      {/* Current vs Target banner */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="rounded-2xl p-4 border" style={{background:"#00c9b108",borderColor:"#00c9b130"}}>
+          <div className="font-black text-sm mb-1" style={{color:"#00c9b1"}}>🟢 Current State (UAT)</div>
+          <p className={`text-xs ${t.textMuted}`}>Single-file React 18 JSX SPA · Deployed on Netlify · All data in React state + localStorage · No backend · No real auth · SMTP simulated</p>
+        </div>
+        <div className="rounded-2xl p-4 border" style={{background:"#4a90d908",borderColor:"#4a90d930"}}>
+          <div className="font-black text-sm mb-1" style={{color:"#4a90d9"}}>🎯 Production Target</div>
+          <p className={`text-xs ${t.textMuted}`}>React SPA + Node.js REST API + PostgreSQL 15 · JWT auth · Real SMTP email · Cron scheduler · Docker · HTTPS</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <StackCard icon="⚛️" name="React 18"       version="^18.3"    role="Frontend"
-          color="#00c9b1" bullets={["Functional components + hooks","useMemo / useCallback for perf","React Context for auth state","Strict mode enabled"]}/>
-        <StackCard icon="▲"  name="Next.js 14"     version="^14.2"    role="Framework"
-          color="#e2e8f0" bullets={["App Router with server components","Protected layouts via middleware","Image optimisation built-in","API routes as BFF proxy"]}/>
-        <StackCard icon="🎨" name="Tailwind CSS"   version="^3.4"     role="Styling"
-          color="#34d399" bullets={["Utility-first, zero runtime CSS","Dark mode via class strategy","Custom design tokens","Component library support"]}/>
-        <StackCard icon="🟢" name="Node.js 20 LTS" version="LTS"      role="Runtime"
-          color="#6ee7b7" bullets={["REST API with routing","Async/await throughout","File upload handling","Graceful shutdown"]}/>
-        <StackCard icon="🐘" name="PostgreSQL 15"  version="^15.0"    role="Database"
-          color="#4a90d9" bullets={["UUID primary keys","Generated INR column","Full-text search support","Connection pool"]}/>
-        <StackCard icon="📊" name="SheetJS"         version="^0.20"    role="Excel"
-          color="#fbbf24" bullets={["Parse .xlsx / .xls / .csv","Generate export downloads","Stream large files","Column header validation"]}/>
-        <StackCard icon="🔑" name="JWT Auth"        version="RS256"    role="Auth"
-          color="#f87171" bullets={["Signed access tokens","Refresh token rotation","Cost-factor password hash","Role-based middleware"]}/>
-        <StackCard icon="🐳" name="Docker"          version="Compose v2" role="DevOps"
-          color="#22d3ee" bullets={["Multi-stage API build","DB service container","Volume for persistence","Health check endpoints"]}/>
-        <StackCard icon="📡" name="Recharts"        version="^2.12"    role="Charts"
-          color="#a78bfa" bullets={["Composable chart primitives","Responsive containers","Custom tooltips","Animated on data change"]}/>
+        <StackCard icon="⚛️" name="React 18"         version="^18.3"      role="Frontend"
+          color="#00c9b1" bullets={[
+            "Functional components + hooks throughout",
+            "React Context: UserContext + LockContext",
+            "useRBAC() hook for all permission checks",
+            "Single-file JSX SPA (current architecture)",
+            "Dark / Light theme with inline style switching",
+          ]}/>
+        <StackCard icon="🎨" name="Tailwind CSS"     version="CDN ^3.4"   role="Styling"
+          color="#34d399" bullets={[
+            "Utility-first, zero runtime CSS",
+            "Dark mode via inline style overrides",
+            "Custom color tokens per module",
+            "Responsive grid layouts throughout",
+          ]}/>
+        <StackCard icon="📡" name="Recharts"          version="^2.12"      role="Charts"
+          color="#a78bfa" bullets={[
+            "CAS MIS: Donut, Bar, Scatter, Treemap, 100% Stacked Bar",
+            "KRA/KPI: Heatmap, Radar-style bar",
+            "Fund Request: Bar, Line, Pie charts",
+            "Dashboard: All chart types aggregated",
+            "ResponsiveContainer on all panels",
+          ]}/>
+        <StackCard icon="📊" name="SheetJS (XLSX)"   version="^0.20"      role="Excel"
+          color="#fbbf24" bullets={[
+            "Client Master: bulk import + export",
+            "User import workflow",
+            "CAS MIS, KRA/KPI, Fund Request: row export",
+            "Audit Log: export to Excel",
+            "Column header validation on import",
+          ]}/>
+        <StackCard icon="🗄️" name="localStorage"    version="Browser API" role="Storage (UAT)"
+          color="#fb923c" bullets={[
+            "procas_locks — Month lock state",
+            "procas_lockAudit — Lock audit trail",
+            "procas_reminders — Reminder records",
+            "procas_smtpCfg — SMTP config (⚠ security risk)",
+            "procas_fyMaster / statesMaster / sectorsMaster / currMaster",
+          ]}/>
+        <StackCard icon="▲"  name="Netlify"          version="Static SPA" role="Hosting (UAT)"
+          color="#e2e8f0" bullets={[
+            "Current live URL: procas.netlify.app",
+            "Deployed as static React SPA",
+            "No server-side rendering",
+            "IT whitelist required for office access",
+            "CDN delivery via Netlify Edge",
+          ]}/>
+        <StackCard icon="🟢" name="Node.js 20 LTS"   version="LTS"        role="Backend (Target)"
+          color="#6ee7b7" bullets={[
+            "REST API with Express.js routing",
+            "Routes: auth, clients, cas-mis, kra-kpi, fund, users, locks, reminders, master",
+            "Multer for file uploads",
+            "Nodemailer for invite email delivery",
+            "Graceful shutdown + health check endpoint",
+          ]}/>
+        <StackCard icon="🐘" name="PostgreSQL 15"    version="^15.0"      role="Database (Target)"
+          color="#4a90d9" bullets={[
+            "9 core tables fully specified in DB Schema",
+            "UUID primary keys throughout",
+            "Generated INR column in fund_requests",
+            "UNIQUE constraints on FY/Month/Module locks",
+            "Connection pool singleton",
+          ]}/>
+        <StackCard icon="🔑" name="JWT + bcrypt"     version="RS256"      role="Auth (Target)"
+          color="#f87171" bullets={[
+            "Signed access tokens (1h) + Refresh tokens (7d)",
+            "bcrypt password hashing (cost factor 12)",
+            "Role claim + assignedClients[] embedded in JWT",
+            "HMAC-SHA256 invite tokens (replace current btoa)",
+            "Role-based middleware on all protected routes",
+          ]}/>
+        <StackCard icon="✉️" name="SMTP / Nodemailer" version="^6.x"      role="Email (Target)"
+          color="#22d3ee" bullets={[
+            "Currently simulated via setTimeout in UAT",
+            "Production: Nodemailer + SMTP server",
+            "Invite email delivery with token link",
+            "Reminder notification dispatch",
+            "Credentials in server-side env vars only",
+          ]}/>
+        <StackCard icon="⏰" name="Cron Scheduler"   version="node-cron"  role="Reminders (Target)"
+          color="#fb923c" bullets={[
+            "Currently UI-only in UAT",
+            "Production: node-cron or queue worker",
+            "Reads active reminders from DB on schedule",
+            "Dispatches emails via Nodemailer",
+            "Updates last_sent timestamp after trigger",
+          ]}/>
+        <StackCard icon="🐳" name="Docker"           version="Compose v2" role="DevOps (Target)"
+          color="#22d3ee" bullets={[
+            "Multi-stage API build container",
+            "PostgreSQL service container",
+            "Volume for DB persistence",
+            "Health check endpoints",
+            "docker-compose.yml in project root",
+          ]}/>
       </div>
 
       <Card>
@@ -9900,23 +10649,26 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
             "  db:",
             "    image: postgres:15-alpine",
             "    environment:",
-            "      POSTGRES_DB:       ca_dashboard",
-            "      POSTGRES_USER:     causer",
+            "      POSTGRES_DB:       procas",
+            "      POSTGRES_USER:     procasuser",
             "      POSTGRES_PASSWORD: (from .env)",
             "    volumes:",
             "      - pgdata:/var/lib/postgresql/data",
             "      - ./migrations:/docker-entrypoint-initdb.d",
             "    healthcheck:",
-            "      test: pg_isready -U causer -d ca_dashboard",
+            "      test: pg_isready -U procasuser -d procas",
             "      interval: 10s",
             "",
             "  api:",
             "    build: ./apps/api",
             "    environment:",
-            "      DATABASE_URL: postgres://causer@db:5432/ca_dashboard",
-            "      JWT_SECRET:   (from .env)",
-            "      NODE_ENV:     production",
-            "      PORT:         4000",
+            "      DATABASE_URL:  postgres://procasuser@db:5432/procas",
+            "      JWT_SECRET:    (from .env)",
+            "      SMTP_HOST:     (from .env)",
+            "      SMTP_USER:     (from .env)",
+            "      SMTP_PASS:     (from .env)   ← server-side only, never localStorage",
+            "      NODE_ENV:      production",
+            "      PORT:          4000",
             "    depends_on:",
             "      db: { condition: service_healthy }",
             "    ports: [4000:4000]",
@@ -9939,18 +10691,174 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
   // ── FLOW ──────────────────────────────────────────────────────────────────
   const FlowSection = () => (
     <div className="space-y-5">
+
+      {/* Master platform data flow */}
       <Card>
-        <CardHeader title="📥 Excel Import Pipeline — Master Client Data"/>
+        <CardHeader title="🔄 Master Platform Data Flow — All Modules"/>
+        <div className="p-5">
+          <div className="space-y-2">
+            {[
+              { layer:"Client Master",    color:"#34d399", actions:["Root entity — all modules reference client_id","Admin creates clients with Sector, State, User Assignments","Bulk import via Excel (.xlsx / .csv) with duplicate detection"] },
+              { layer:"User Assignment",  color:"#22d3ee", actions:["Admin assigns End Users to specific clients","useRBAC() hook reads assignedClients[] at runtime","Unassigned clients shown with View Only badge in all modules"] },
+              { layer:"CAS MIS",          color:"#4a90d9", actions:["Per-client monthly MIS date, outstanding dues, collection status","Statutory compliance (PT/TDS/PF/ESI/GST) tracked as Y/N/A","Month Lock blocks saves when FY/Month/cas is locked"] },
+              { layer:"KRA / KPI",        color:"#a78bfa", actions:["Per-client monthly KPI scoring across 6 parameters","Applicability toggles per parameter (admin-controlled)","Month Lock blocks saves when FY/Month/kra is locked"] },
+              { layer:"Fund Request",     color:"#fb923c", actions:["Per-client multi-currency fund entries","INR auto-calculated: foreign_amount × exchange_rate","Month Lock blocks saves when FY/Month/fund is locked"] },
+              { layer:"Analytics Engine", color:"#fbbf24", actions:["CAS MIS Analytics: revenue mix, SPOC dues, statutory health, collection timeline","KRA/KPI Analytics: parameter scores, heatmap, escalation trend","Fund Request Analytics: currency breakdown, monthly trend, top clients"] },
+              { layer:"Dashboard",        color:"#00c9b1", actions:["Aggregates all 3 analytics layers into executive KPI scorecards","Cross-module filters: Month/Quarter/Year, Client search, SPOC","Deep Dive rows: KRA heatmap, Top 10 clients bar, Funding ledger"] },
+            ].map(l=>(
+              <div key={l.layer} className="flex items-start gap-3 p-3 rounded-xl"
+                style={{background:l.color+"0a",border:`1px solid ${l.color}20`}}>
+                <div className="min-w-[130px] font-bold text-[11px] pt-0.5" style={{color:l.color}}>{l.layer}</div>
+                <div className="flex flex-wrap gap-2">
+                  {l.actions.map((a,i)=>(
+                    <span key={i} className={`text-[11px] px-2 py-0.5 rounded-full ${t.textMuted}`}
+                      style={{background:dark?"#1e2535":"#f0f4f8"}}>{a}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* RBAC flow */}
+      <Card>
+        <CardHeader title="🔐 User Database → Role Validation → Module Access Control"/>
+        <div className="p-5">
+          <div className="space-y-2">
+            {[
+              { layer:"User Database",     color:"#00c9b1", actions:["Admin creates user with role (Admin / End User)","Assigns specific client IDs to End User","Sends invite email with HMAC-signed token"] },
+              { layer:"Login / Auth",      color:"#34d399", actions:["User activates account via invite token","JWT issued with role + assignedClients[] claims","Refresh token stored; access token expires in 1h"] },
+              { layer:"useRBAC() Hook",    color:"#fbbf24", actions:["isAdmin derived from activeUser.role === 'Admin'","canEdit(clientId) returns true if Admin or client in assignedClients[]","assignedClientIds = null for Admin (all clients)"] },
+              { layer:"Module Access",     color:"#4a90d9", actions:["CAS MIS: edit enabled only if canEdit(client.id) && !casMisLocked","KRA/KPI: edit enabled only if canEdit(client.id) && !kraLocked","Fund Request: edit enabled only if canEdit(client.id) && !fundRowLocked"] },
+              { layer:"View Only Badge",   color:"#a78bfa", actions:["Unassigned rows show 'View Only' chip in Actions column","All Save/Delete/Add buttons hidden for unassigned clients","Data is visible but not editable"] },
+            ].map(l=>(
+              <div key={l.layer} className="flex items-start gap-3 p-3 rounded-xl"
+                style={{background:l.color+"0a",border:`1px solid ${l.color}20`}}>
+                <div className="min-w-[130px] font-bold text-[11px] pt-0.5" style={{color:l.color}}>{l.layer}</div>
+                <div className="flex flex-wrap gap-2">
+                  {l.actions.map((a,i)=>(
+                    <span key={i} className={`text-[11px] px-2 py-0.5 rounded-full ${t.textMuted}`}
+                      style={{background:dark?"#1e2535":"#f0f4f8"}}>{a}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Month Lock flow */}
+      <Card>
+        <CardHeader title="🔒 Admin → Month Lock → Module Data Locking"/>
+        <div className="p-5">
+          <div className="space-y-2">
+            {[
+              { layer:"Admin Action",      color:"#fbbf24", actions:["Selects FY + Month + Module (cas | kra | fund | all)","Clicks Lock button in Architect → Month Lock","Bulk Lock option available to lock entire FY at once"] },
+              { layer:"Lock Key Created",  color:"#f87171", actions:["mkLockKey(fy, month, mod) generates 'FY|Month|mod' string","Stored in localStorage[procas_locks] object","Audit entry written to procas_lockAudit[]"] },
+              { layer:"checkLocked()",     color:"#a78bfa", actions:["checkLocked(locks, fy, month, mod) checks specific key","Also checks 'all' key: locks[FY|Month|all]","Returns true if either specific or 'all' lock exists"] },
+              { layer:"CAS MIS Effect",    color:"#4a90d9", actions:["casMisLocked = checkLocked(locks, selectedFY, selectedMonth, 'cas')","canEdit overridden: locked month → all edits blocked","Lock banner shown: 'Month is locked — Architect → Month Lock to unlock'"] },
+              { layer:"KRA/KPI Effect",    color:"#a78bfa", actions:["kraLocked = checkLocked(locks, selectedFY, selectedMonth, 'kra')","isEdit forced false when locked","Edit button hidden for all rows regardless of user assignment"] },
+              { layer:"Fund Request Effect",color:"#fb923c",actions:["fundRowLocked checked per row (same FY/Month)","canEditRow = isAdmin && !fundRowLocked","Add Row, Save, Delete all disabled when locked"] },
+            ].map(l=>(
+              <div key={l.layer} className="flex items-start gap-3 p-3 rounded-xl"
+                style={{background:l.color+"0a",border:`1px solid ${l.color}20`}}>
+                <div className="min-w-[140px] font-bold text-[11px] pt-0.5" style={{color:l.color}}>{l.layer}</div>
+                <div className="flex flex-wrap gap-2">
+                  {l.actions.map((a,i)=>(
+                    <span key={i} className={`text-[11px] px-2 py-0.5 rounded-full ${t.textMuted}`}
+                      style={{background:dark?"#1e2535":"#f0f4f8"}}>{a}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Reminder flow */}
+      <Card>
+        <CardHeader title="🔔 Admin → Auto Reminder → User Notifications"/>
+        <div className="p-5">
+          <div className="space-y-2">
+            {[
+              { layer:"Admin Creates",     color:"#34d399", actions:["Title, Module, Frequency (daily/weekly/monthly), Trigger Day","Target Role: Admin, End User, or All","Message body entered","Stored to localStorage[procas_reminders]"] },
+              { layer:"Scheduler (Target)",color:"#fbbf24", actions:["node-cron job reads active reminders from DB","Evaluates frequency + trigger_day against current date","Dispatches email via Nodemailer for matching reminders"] },
+              { layer:"User Receives",     color:"#00c9b1", actions:["Notification delivered to target role's email","last_sent timestamp updated in DB","Reminder log visible in Architect → Reminders"] },
+              { layer:"Admin Controls",    color:"#a78bfa", actions:["Pause / Resume reminder without deleting","Manual Trigger available for immediate dispatch","Delete reminder permanently"] },
+            ].map(l=>(
+              <div key={l.layer} className="flex items-start gap-3 p-3 rounded-xl"
+                style={{background:l.color+"0a",border:`1px solid ${l.color}20`}}>
+                <div className="min-w-[140px] font-bold text-[11px] pt-0.5" style={{color:l.color}}>{l.layer}</div>
+                <div className="flex flex-wrap gap-2">
+                  {l.actions.map((a,i)=>(
+                    <span key={i} className={`text-[11px] px-2 py-0.5 rounded-full ${t.textMuted}`}
+                      style={{background:dark?"#1e2535":"#f0f4f8"}}>{a}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Analytics architecture */}
+      <Card>
+        <CardHeader title="📊 Analytics Architecture — Data Sources → Visualisations → Dashboard"/>
+        <div className="p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              { title:"CAS MIS Analytics", color:"#4a90d9", icon:"📋",
+                sources:["cas_mis table — all monthly records","client_master — sector/state/RM"],
+                calcs:["Total Expected Revenue = sum(outstanding_dues)","Collection % = collected / expected × 100","Reconciliation Gap = sum(recon_gap)","Statutory Health = Y/N/A counts per type"],
+                charts:["Revenue Mix donut (by sector)","Outstanding SPOC Dues horizontal bar","Collection Timeline scatter","Statutory Health 100% stacked bar","MIS Turnaround colour-coded bar","Software Ecosystem treemap"] },
+              { title:"KRA/KPI Analytics", color:"#a78bfa", icon:"🎯",
+                sources:["kra_kpi table — all parameter values","client_master — for client names"],
+                calcs:["Parameter Score = Y count / (Y+N) × 100 (excluding A)","Overall KPI score = mean of 6 parameter scores","Escalation Count = N count on escalation field"],
+                charts:["Parameter score bar chart","Client compliance heatmap","Escalation trend line","Mini donut per KPI parameter"] },
+              { title:"Fund Request Analytics", color:"#fb923c", icon:"💰",
+                sources:["fund_requests table — currency, amounts","client_master — for client names"],
+                calcs:["Total INR = sum(inr_amount)","Currency Breakdown = INR grouped by currency","Monthly Trend = INR grouped by month","Top Clients = INR ranked descending"],
+                charts:["Currency breakdown donut","Monthly INR trend area chart","Top 10 clients bar chart","Funding pipeline stacked bar","Funding ledger with variance"] },
+            ].map(a=>(
+              <div key={a.title} className="rounded-2xl border p-4" style={{borderColor:a.color+"40"}}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">{a.icon}</span>
+                  <span className="font-black text-sm" style={{color:a.color}}>{a.title}</span>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <div className={`text-[10px] font-bold uppercase tracking-widest ${t.textMuted} mb-1`}>Data Sources</div>
+                    {a.sources.map(s=><div key={s} className={`text-[11px] ${t.textMuted} flex gap-1.5`}><span style={{color:a.color}}>▸</span>{s}</div>)}
+                  </div>
+                  <div>
+                    <div className={`text-[10px] font-bold uppercase tracking-widest ${t.textMuted} mb-1`}>Calculations</div>
+                    {a.calcs.map(s=><div key={s} className={`text-[11px] ${t.textMuted} flex gap-1.5`}><span style={{color:a.color}}>▸</span>{s}</div>)}
+                  </div>
+                  <div>
+                    <div className={`text-[10px] font-bold uppercase tracking-widest ${t.textMuted} mb-1`}>Visualisations</div>
+                    {a.charts.map(s=><div key={s} className={`text-[11px] ${t.textMuted} flex gap-1.5`}><span style={{color:a.color}}>▸</span>{s}</div>)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Client Import flow */}
+      <Card>
+        <CardHeader title="📥 Excel Import Pipeline — Client Master"/>
         <div className="p-5">
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {[
-              { n:1, icon:"📂", title:"Select file",    desc:"Browser File API\n.xlsx / .csv",         color:"#00c9b1" },
-              { n:2, icon:"⚙️", title:"Parse",          desc:"SheetJS converts\nrows to JS objects",  color:"#34d399" },
-              { n:3, icon:"✅", title:"Validate cols",  desc:"Detect Client Name\n+ Person Name cols", color:"#fbbf24" },
-              { n:4, icon:"📡", title:"POST to API",    desc:"Multipart upload\nwith auth token",      color:"#4a90d9" },
-              { n:5, icon:"🛡️", title:"Server validate",desc:"Schema checks\nSanitise each row",      color:"#a78bfa" },
-              { n:6, icon:"🗄️", title:"Upsert",        desc:"Insert new rows\nUpdate duplicates",     color:"#f87171" },
-              { n:7, icon:"📊", title:"Summary",        desc:"Return counts:\nadded/updated/errors",   color:"#22d3ee" },
+              { n:1, icon:"📂", title:"Select file",    desc:"Browser File API\n.xlsx / .csv\nDrag-and-drop support",    color:"#00c9b1" },
+              { n:2, icon:"⚙️", title:"Parse",          desc:"SheetJS converts\nrows to JS objects\nHeader validation",  color:"#34d399" },
+              { n:3, icon:"✅", title:"Validate cols",  desc:"Client Name\nSector, State\nAssigned Users",               color:"#fbbf24" },
+              { n:4, icon:"📡", title:"POST to API",    desc:"Multipart upload\nwith auth token\nAdmin role required",   color:"#4a90d9" },
+              { n:5, icon:"🛡️", title:"Server validate",desc:"Schema checks\nSanitise each row\nDuplicate detection",   color:"#a78bfa" },
+              { n:6, icon:"🗄️", title:"Upsert",        desc:"Insert new rows\nUpdate duplicates\nSet user assignments", color:"#f87171" },
+              { n:7, icon:"📊", title:"Summary",        desc:"Total / Imported\nFailed / Duplicates\nError report download", color:"#22d3ee" },
             ].map(s=>(
               <div key={s.n} className="flex flex-col items-center gap-1.5 text-center">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-base shadow-md"
@@ -9964,15 +10872,16 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
         </div>
       </Card>
 
+      {/* Fund Request INR flow */}
       <Card>
         <CardHeader title="💰 Fund Request — INR Auto-Calculation Flow"/>
         <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {[
-            { n:1, icon:"✏️", title:"Fill row",       desc:"Client dropdown\nCurrency + Amount\nExchange Rate",         color:"#00c9b1" },
-            { n:2, icon:"⚡", title:"Auto-calc INR",  desc:"fc × rate instantly\nNo server roundtrip\nBlue AUTO cell", color:"#34d399" },
-            { n:3, icon:"📡", title:"Save to API",    desc:"Validated payload\nJWT token checked\nAdmin role enforced", color:"#fbbf24" },
-            { n:4, icon:"🗄️", title:"DB generates",  desc:"inr_amount column\nROUND(fc × rate, 2)\nAlways authoritative", color:"#4a90d9" },
-            { n:5, icon:"📋", title:"Audit + Return", desc:"Audit row written\nFull row returned\nUI state updated",    color:"#f87171" },
+            { n:1, icon:"✏️", title:"Fill row",       desc:"Client dropdown\nCurrency + Amount\nExchange Rate",            color:"#00c9b1" },
+            { n:2, icon:"⚡", title:"Auto-calc INR",  desc:"fc × rate instantly\nNo server roundtrip\nBlue AUTO cell",    color:"#34d399" },
+            { n:3, icon:"📡", title:"Save to API",    desc:"Validated payload\nJWT token checked\nRBAC + Lock checked",   color:"#fbbf24" },
+            { n:4, icon:"🗄️", title:"DB generates",  desc:"inr_amount column\nROUND(fc × rate, 2)\nAlways authoritative",color:"#4a90d9" },
+            { n:5, icon:"📋", title:"Audit + Return", desc:"Audit row written\nFull row returned\nUI state updated",      color:"#f87171" },
           ].map(s=>(
             <div key={s.n} className="rounded-xl p-4 border"
               style={{background:s.color+"0f",borderColor:s.color+"30"}}>
@@ -9983,34 +10892,6 @@ const ArchitectureTab = ({ t, dark, isAdmin, adminName }) => {
               </div>
               <div className="font-bold text-xs mb-1" style={{color:s.color}}>{s.title}</div>
               <div className={`text-[10px] leading-relaxed ${t.textMuted} whitespace-pre-line`}>{s.desc}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <Card>
-        <CardHeader title="🔄 Request Lifecycle — Fund Entry (POST)"/>
-        <div className="p-5 space-y-2">
-          {[
-            { layer:"React UI",       color:"#00c9b1", actions:["User fills inline table row","INR auto-calculated client-side: fc × rate","User clicks Save button"] },
-            { layer:"HTTP Client",    color:"#34d399", actions:["Attaches Bearer token from localStorage","Serialises payload to JSON","Sends POST to /api/fund-requests"] },
-            { layer:"Auth Middleware",color:"#fbbf24", actions:["Verifies JWT signature","Checks token expiry","Confirms role = admin"] },
-            { layer:"Route Handler",  color:"#4a90d9", actions:["Validates all fields with schema","Sanitises string inputs","Runs INSERT query with parameterised values"] },
-            { layer:"Database",       color:"#a78bfa", actions:["Stores row with auto-generated UUID","Computes inr_amount via generated column","Returns inserted row"] },
-            { layer:"Audit Service",  color:"#f87171", actions:["Writes INSERT record to audit_log","Stores actor ID, timestamp, new_data snapshot"] },
-            { layer:"Response",       color:"#22d3ee", actions:["201 Created with full row data","Frontend appends to state","Toast notification shown"] },
-          ].map(l=>(
-            <div key={l.layer} className="flex items-start gap-3 p-3 rounded-xl"
-              style={{background:l.color+"0a",border:`1px solid ${l.color}20`}}>
-              <div className="min-w-[110px] font-bold text-[11px] pt-0.5" style={{color:l.color}}>{l.layer}</div>
-              <div className="flex flex-wrap gap-2">
-                {l.actions.map((a,i)=>(
-                  <span key={i} className={`text-[11px] px-2 py-0.5 rounded-full ${t.textMuted}`}
-                    style={{background:dark?"#1e2535":"#f0f4f8"}}>
-                    {a}
-                  </span>
-                ))}
-              </div>
             </div>
           ))}
         </div>
@@ -11040,7 +11921,16 @@ export default function CADashboard() {
             const isActive = activeTab === item.id;
             return (
               <button key={item.id}
-                onClick={() => !isLogout && setActiveTab(item.id)}
+                onClick={() => {
+                  if (isLogout) {
+                    // Reset session: return to default Admin seed user, go to Dashboard, close sidebar
+                    setActiveUser(INITIAL_USERS[0]);
+                    setActiveTab("dashboard");
+                    setSidebarOpen(false);
+                  } else {
+                    setActiveTab(item.id);
+                  }
+                }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
                 style={isLogout
                   ? { color:"#f87171" }
@@ -11065,10 +11955,12 @@ export default function CADashboard() {
             onMouseEnter={e => e.currentTarget.style.background = "#1a2d44"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
             <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
-              style={{ background:"linear-gradient(135deg,#003d5c,#00c9b1)" }}>PS</div>
+              style={{ background:"linear-gradient(135deg,#003d5c,#00c9b1)" }}>
+              {(activeUser?.name||"AU").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()}
+            </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-semibold truncate text-[#e8f0f8]">Priya Sharma</div>
-              <div className="text-[10px] text-[#5a7a99]">Senior Partner</div>
+              <div className="text-xs font-semibold truncate text-[#e8f0f8]">{activeUser?.name || "Admin User"}</div>
+              <div className="text-[10px] text-[#5a7a99]">{activeUser?.role || "User"}</div>
             </div>
           </div>
         </div>
@@ -11156,6 +12048,7 @@ export default function CADashboard() {
         </header>
 
         {/* MAIN — background inherited from root wrapper; modules use t.* tokens */}
+        <ErrorBoundary>
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           {activeTab === "dashboard" && (
             <DashboardTab t={t} dark={dark} isAdmin={isAdmin}/>
@@ -11197,8 +12090,7 @@ export default function CADashboard() {
           {activeTab === "arch"   && <ArchitectureTab t={t} dark={dark} isAdmin={isAdmin} adminName={activeUser?.name || "Admin"}/>}
           {activeTab === "userdb" && <UserDatabaseTab t={t} dark={dark} isAdmin={isAdmin}/>}
         </main>
-
-        {/* FOOTER — inline style so background ALWAYS switches with the theme */}
+        </ErrorBoundary>        {/* FOOTER — inline style so background ALWAYS switches with the theme */}
         <footer className="px-6 pt-3 pb-2 border-t flex flex-col gap-1.5"
           style={{
             background:  raw.footerBg,
